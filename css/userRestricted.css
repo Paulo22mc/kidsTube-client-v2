@@ -1,0 +1,16 @@
+.avatar-selection img {
+    width: 100px;
+    height: 100px;
+    cursor: pointer;
+    border-radius: 50%;
+    margin: 5px;
+}
+
+.avatar-selection img.selected {
+    border: 3px solid black;
+}
+
+.form-container {
+    max-width: 500px;
+    margin: 0 auto;
+}

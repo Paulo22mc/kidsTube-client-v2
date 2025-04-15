@@ -1,0 +1,185 @@
+/* Estilos Globales */
+body {
+    background: linear-gradient(to bottom, #002244, #004488, #0066cc);
+    min-height: 100vh;
+    margin: 0;
+    color: white; /* Hace que el texto sea más visible */
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Gradiente para el fondo de la carta */
+.gradient-custom-3 {
+    background: linear-gradient(to right, #206a5d, #3a7ca5, #2d728f, #1b4965);
+}
+
+/* Gradiente para un fondo más suave */
+.gradient-custom-4 {
+    background: linear-gradient(to right, #206a5d, #2d728f, #1b4965, #3a7ca5);
+}
+
+/* Estilos de la carta */
+.card {
+    max-width: 400px;
+    margin: auto;
+    border-radius: 15px;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1); /* Sombra suave para destacar */
+}
+
+/* Estilos del contenido dentro de la carta */
+.card-body {
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.3); /* Fondo con opacidad para dar profundidad */
+    border-radius: 10px; /* Bordes redondeados */
+}
+
+/* Estilo para los botones */
+.btn-success {
+    background: linear-gradient(to right, #206a5d, #3a7ca5, #2d728f, #1b4965); /* Botón con fondo degradado */
+    border: none;
+    color: white;
+    padding: 12px 30px;
+    font-size: 16px;
+    border-radius: 25px;
+    text-align: center;
+    transition: background-color 0.3s ease; /* Transición suave para el hover */
+}
+
+.btn-success:hover {
+    background: linear-gradient(to right, #1b4965, #2d728f, #3a7ca5, #206a5d); /* Degradado invertido al pasar el ratón */
+}
+
+/* Estilos para los campos de selección en el formulario (con degradado) */
+.card-registration .select-input.form-control[readonly]:not([disabled]) {
+    font-size: 1rem;
+    line-height: 2.15;
+    padding-left: .75em;
+    padding-right: .75em;
+    background: linear-gradient(to right, #206a5d, #3a7ca5, #2d728f, #1b4965);
+    color: white;
+    border: none;
+    border-radius: 0.25rem;
+}
+
+.card-registration .form-control {
+    background: rgba(255, 255, 255, 0.2); /* Fondo semi-transparente */
+    color: white;
+    border: none;
+}
+
+.card-registration .form-control::placeholder {
+    color: rgba(255, 255, 255, 0.7); /* Placeholder blanco transparente */
+}
+
+.card-registration .form-label {
+    color: white; /* Etiquetas de formulario en blanco */
+}
+
+.card-registration h1 {
+    color: white; /* Título de la tarjeta en blanco */
+    text-align: center;
+}
+
+/* Estilo de la marca "KidsTube" */
+.brand-name {
+    font-size: 2rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    position: relative;
+    display: inline-block;
+    padding: 5px 15px;
+    background: linear-gradient(135deg, #00e6e6, #0077ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 3px 3px 10px rgba(0, 255, 255, 0.6);
+}
+
+/* Ajuste especial para que "Kids" y "Tube" estén juntos */
+.brand-container {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* Navbar estilizado */
+.navbar {
+    background: rgba(0, 0, 0, 0.3) !important; /* Fondo semitransparente */
+    padding: 15px 30px; /* Espaciado más amplio */
+}
+
+/* Espaciado adicional para los enlaces de navegación */
+.navbar-nav .nav-item {
+    margin-right: 25px; /* Más separación entre los elementos del menú */
+}
+
+.navbar .nav-link {
+    color: white !important;
+    font-size: 1.1rem;
+    font-weight: bold;
+    padding: 12px 18px; /* Espaciado más cómodo */
+    transition: 0.3s;
+    border-radius: 8px;
+}
+
+.navbar .nav-link:hover {
+    background: rgba(255, 255, 255, 0.2); /* Resalte sutil al pasar el cursor */
+    color: #00e6e6 !important; /* Un turquesa llamativo */
+}
+
+/* Estilo para los elementos de la tarjeta */
+.card-header {
+    background-color: #f8f9fa;
+    font-weight: bold;
+}
+
+.card-body {
+    background-color: #f1f3f5;
+}
+
+/* Estilo para los checkboxes simulados como radio buttons */
+.radio-checkbox-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.radio-checkbox-container label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1rem;
+    color: #000;
+}
+
+.radio-checkbox-container input[type="checkbox"] {
+    appearance: none; /* Elimina el estilo predeterminado */
+    width: 16px;
+    height: 16px;
+    border: 2px solid #0069d9;
+    border-radius: 50%; /* Hace que parezca un radio button */
+    cursor: pointer;
+}
+
+.radio-checkbox-container input[type="checkbox"]:checked {
+    background-color: #0069d9;
+    border-color: #0069d9;
+}
+
+/* Estilo para el formulario */
+.playlist-form input,
+.playlist-form select {
+    margin-bottom: 15px;
+}
+
+.form-container {
+    margin-top: 30px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+/* Estilos para el botón de "Submit" y "Reset" */
+.d-flex button {
+    border-radius: 25px;
+}

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KidsTube</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- CSS Personalizado -->
+    <link rel="stylesheet" href="../../css/createPlaylist.css">
+</head>
+
+<body>
+    <!-- Navbar Mejorado -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+        <div class="container-fluid">
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <span class="brand-name fw-bold">KidsTube</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="../dashboard/dashboard.html">
+                            <i class="bi bi-house-door me-1"></i>Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="../userRrestricted/showUser.html">
+                            <i class="bi bi-people me-1"></i>Users
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="../video/videoList.html">
+                            <i class="bi bi-play-circle me-1"></i>Videos
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="./showPlaylist.html">
+                            <i class="bi bi-collection-play me-1"></i>Playlists
+                        </a>
+                    </li>
+                </ul>
+                <div class="d-flex">
+                    </form>
+                    <div class="dropdown">
+                        <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle"
+                            id="userDropdown" data-bs-toggle="dropdown">
+                            <img src="../../images/icono.png" alt="User" width="32" height="32"
+                                class="rounded-circle me-2">
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#" id="logout"><i
+                                        class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenido Principal -->
+    <main class="container my-4">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h2 class="h5 mb-0" id="formTitle">Edit Playlist</h2>
+            </div>
+            <div class="card-body">
+                <form id="playlistForm" class="needs-validation" novalidate>
+                    <!-- Nombre de la Playlist -->
+                    <div class="mb-4">
+                        <label for="playlistName" class="form-label fw-bold">Playlist Name</label>
+                        <input type="text" class="form-control form-control-lg" id="playlistName"
+                            placeholder="My Awesome Playlist" required>
+                    </div>
+    
+                    <!-- Selección de Perfiles -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold d-flex justify-content-between align-items-center">
+                            <span>Select Profiles</span>
+                            <small class="text-muted fw-normal">Choose who can access</small>
+                        </label>
+                        <div id="profilesContainer" class="profiles-grid">
+                            <div id="loadingProfiles" class="text-center py-3">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <p class="mt-2 text-muted">Loading profiles...</p>
+                            </div>
+                        </div>
+                    </div>
+    
+                    <!-- Selección de Videos -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold d-flex justify-content-between align-items-center">
+                            <span>Select Videos</span>
+                            <small class="text-muted fw-normal">Choose content to include</small>
+                        </label>
+                        <div id="videosContainer" class="videos-grid">
+                            <div id="loadingVideos" class="text-center py-3">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <p class="mt-2 text-muted">Loading videos...</p>
+                            </div>
+                        </div>
+                    </div>
+    
+                    <!-- Botones de Acción -->
+                    <div class="d-flex justify-content-between pt-3 border-top">
+                        <a href="./showPlaylist.html" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left me-1"></i>Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary px-4" id="saveButton">
+                            <i class="bi bi-save me-1"></i>Update Playlist
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../../utils/updatePlaylistFunctions.js"></script>
+    <script src="../../utils/logoutFunctions.js"></script>
+
+</body>
+
+</html>

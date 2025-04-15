@@ -1,0 +1,86 @@
+/* Gradiente para el fondo de la carta */
+.gradient-custom-3 {
+    background: linear-gradient(to bottom, #002244, #004488, #0066cc); 
+}
+
+
+/* Estilos de la carta */
+.card {
+    max-width: 400px;
+    margin: auto;
+    border-radius: 15px;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1); 
+}
+
+
+.card-body {
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.3); 
+    border-radius: 10px; 
+}
+
+
+.btn-success {
+    background: linear-gradient(to right, #206a5d, #3a7ca5, #2d728f, #1b4965); 
+    border: none;
+    color: white;
+    padding: 12px 30px;
+    font-size: 16px;
+    border-radius: 25px;
+    text-align: center;
+    transition: background-color 0.3s ease; 
+}
+
+.card-registration .select-input.form-control[readonly]:not([disabled]) {
+    font-size: 1rem;
+    line-height: 2.15;
+    padding-left: .75em;
+    padding-right: .75em;
+    background: linear-gradient(to right, #206a5d, #3a7ca5, #2d728f, #1b4965);
+    color: white;
+    border: none;
+    border-radius: 0.25rem;
+}
+
+.card-registration .form-control {
+    background: rgba(255, 255, 255, 0.2); 
+    color: white;
+    border: none;
+}
+
+.card-registration .form-control::placeholder {
+    color: rgba(255, 255, 255, 0.7); 
+}
+
+.card-registration .form-label {
+    color: white; 
+}
+
+
+
+
+@keyframes moveImage {
+    0% {
+        transform: scale(1) translateX(0);
+    }
+
+    50% {
+        transform: scale(1.05) translateX(5px);
+    }
+
+    100% {
+        transform: scale(1) translateX(0);
+    }
+}
+
+
+body {
+    font-family: 'Poppins', sans-serif;
+}
+
+
+.card-registration h1,
+.card-registration .form-label,
+.card-registration .form-control {
+    font-family: 'Poppins', sans-serif;
+}

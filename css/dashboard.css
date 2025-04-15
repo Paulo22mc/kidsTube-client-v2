@@ -1,0 +1,93 @@
+/* Fondo con gradiente azul oscuro */
+body {
+  background: linear-gradient(to bottom, #002244, #004488, #0066cc);
+  min-height: 100vh; /* Asegura que cubra toda la pantalla */
+  margin: 0;
+  color: white; /* Hace que el texto sea más visible */
+}
+
+/* Navbar estilizado */
+.navbar {
+  background: rgba(0, 0, 0, 0.3) !important; /* Fondo semitransparente */
+  padding: 15px 30px; /* Espaciado más amplio */
+}
+
+/* Espaciado adicional para los enlaces de navegación */
+.navbar-nav .nav-item {
+  margin-right: 25px; /* Más separación entre los elementos del menú */
+}
+
+.navbar .nav-link {
+  color: white !important;
+  font-size: 1.1rem;
+  font-weight: bold;
+  padding: 12px 18px; /* Espaciado más cómodo */
+  transition: 0.3s;
+  border-radius: 8px;
+}
+
+.navbar .nav-link:hover {
+  background: rgba(255, 255, 255, 0.2); /* Resalte sutil al pasar el cursor */
+  color: #00e6e6 !important; /* Un turquesa llamativo */
+}
+
+/* Estilizar la marca "KidsTube" */
+.brand-name {
+  font-size: 2rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  position: relative;
+  display: inline-block;
+  padding: 5px 15px;
+  background: linear-gradient(135deg, #00e6e6, #0077ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 3px 3px 10px rgba(0, 255, 255, 0.6);
+}
+
+/* Ajuste especial para que "Kids" y "Tube" estén juntos */
+.brand-container {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Estilos para el contenedor de perfiles */
+.profiles-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 40px; 
+  padding: 40px;
+  justify-content: center; 
+  align-items: center;
+  min-height: 80vh;
+}
+
+/* Estilos para cada tarjeta de perfil */
+.profile-card {
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.2s;
+  width: 180px; 
+}
+
+.profile-card:hover {
+  transform: scale(1.1);
+}
+
+/* Estilos para la imagen del avatar */
+.profile-avatar {
+  width: 175px;
+  height: 175px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 10px; 
+}
+
+/* Estilos para el nombre del perfil */
+.profile-name {
+  font-size: 18px;
+  font-weight: bold;
+  color: #f3f3f3; 
+}

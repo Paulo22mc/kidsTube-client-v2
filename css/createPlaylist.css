@@ -1,0 +1,97 @@
+/* ------------------------- */
+/* Estilos Base y Globales */
+/* ------------------------- */
+:root {
+    --primary-color: #4361ee;
+    --secondary-color: #3a7ca5;
+    --dark-blue: #002244;
+    --medium-blue: #004488;
+    --light-blue: #0066cc;
+    --teal: #206a5d;
+    --dark-teal: #1b4965;
+    --text-color: #ffffff;
+    --text-light: rgba(255, 255, 255, 0.7);
+    --bg-light: rgba(255, 255, 255, 0.2);
+    --border-radius: 15px;
+    --box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    --transition: all 0.3s ease;
+  }
+  
+  body {
+    background: linear-gradient(to bottom, var(--dark-blue), var(--medium-blue), var(--light-blue));
+    min-height: 100vh;
+    margin: 0;
+    color: var(--text-color);
+    font-family: 'Poppins', sans-serif;
+  }
+  
+  /* ------------------------- */
+  /* Navbar Mejorado */
+  /* ------------------------- */
+  .navbar {
+    background: rgba(0, 0, 0, 0.3) !important;
+    padding: 15px 30px;
+  }
+  
+  .navbar-nav .nav-item {
+    margin-right: 25px;
+  }
+  
+  .navbar .nav-link {
+    color: var(--text-color) !important;
+    font-size: 1.1rem;
+    font-weight: bold;
+    padding: 12px 18px;
+    transition: var(--transition);
+    border-radius: 8px;
+  }
+  
+  .navbar .nav-link:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: #00e6e6 !important;
+  }
+  
+  .navbar .nav-link.active {
+    background: rgba(255, 255, 255, 0.15);
+  }
+  
+  .brand-name {
+    font-size: 2rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    background: linear-gradient(135deg, #00e6e6, #0077ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 3px 3px 10px rgba(0, 255, 255, 0.6);
+  }
+  
+  /* ------------------------- */
+  /* Contenedor Principal */
+  /* ------------------------- */
+  main.container {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+  }
+  
+  /* ------------------------- */
+  /* Estilos de la Tarjeta */
+  /* ------------------------- */
+  .card {
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    border: none;
+    overflow: hidden;
+  }
+  
+  .card-header {
+    background: rgba(0, 0, 0, 0.2) !important;
+    padding: 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .card-header h2 {
+    margin: 0;
+    font-weight: 600;
+  }
+  
