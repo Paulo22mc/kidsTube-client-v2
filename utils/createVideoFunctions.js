@@ -38,10 +38,21 @@ async function createVideo() {
         parent: parent.id
     };
 
+        // Obtener el token JWT del sessionStorage
+        const token = sessionStorage.getItem("token");
+        if (!token) {
+            alert("Authentication token not found. Please log in again.");
+            window.location.href = '/index.html';
+            return;
+        }
+
     try {
         const response = await fetch("http://localhost:3001/api/video", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}` 
+            },
             body: JSON.stringify(videoData),
         });
 

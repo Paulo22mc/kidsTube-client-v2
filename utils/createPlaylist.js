@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const parentData = sessionStorage.getItem("user");
     if (!parentData) {
         console.log("Parent not found");
-        window.location.href = "../../index.html"; 
+        window.location.href = "../../index.html";
         return;
     }
     const parent = JSON.parse(parentData);
@@ -15,17 +15,34 @@ document.addEventListener("DOMContentLoaded", function () {
     // Función para obtener los perfiles y videos de la API
     async function getUserData() {
         try {
+            // Obtener el token JWT del sessionStorage
+            const token = sessionStorage.getItem("token");
+            if (!token) {
+                alert("Authentication token not found. Please log in again.");
+                window.location.href = '/index.html';
+                return;
+            }
 
-            const profileResponse = await fetch(`http://localhost:3001/api/user/parent/${parent.id}`);
-            if (!profileResponse.ok) {
+            // Solicitud para obtener los perfiles
+            const profileResponse = await fetch(`http://localhost:3001/api/user/parent/${parent.id}`, {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${token}` // Incluir el token en el encabezado
+                }
+            }); if (!profileResponse.ok) {
                 throw new Error('Error getting restricted user');
             }
             const profiles = await profileResponse.json();
             console.log("Restrcted users:", profiles);
 
-   
-            const videoResponse = await fetch(`http://localhost:3001/api/video?parentId=${parent.id}`);
-            if (!videoResponse.ok) {
+
+            // Solicitud para obtener los videos
+            const videoResponse = await fetch(`http://localhost:3001/api/video?parentId=${parent.id}`, {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${token}` // Incluir el token en el encabezado
+                }
+            }); if (!videoResponse.ok) {
                 throw new Error('Error getting videos');
             }
             const videos = await videoResponse.json();

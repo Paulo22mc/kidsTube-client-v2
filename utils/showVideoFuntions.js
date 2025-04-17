@@ -37,8 +37,20 @@ async function getVideos() {
     const userId = getUserIdFromSession();
     if (!userId) return [];
 
+    const token = sessionStorage.getItem("token");
+    if (!token) {
+        alert("Authentication token not found. Please log in again.");
+        window.location.href = '/index.html';
+        return [];
+    }
+
     try {
-        const response = await fetch(`${API_URL}?parentId=${userId}`);
+        const response = await fetch(`${API_URL}?parentId=${userId}`, {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${token}` 
+            }
+        });
         if (!response.ok) throw new Error("Error getting videos");
 
         const videos = await response.json();
@@ -68,11 +80,19 @@ async function deleteVideo(id) {
     const confirmDelete = confirm("Are you sure you want to delete this video?");
     if (!confirmDelete) return;
 
+    const token = sessionStorage.getItem("token");
+    if (!token) {
+        alert("Authentication token not found. Please log in again.");
+        window.location.href = '/index.html';
+        return;
+    }
+
     try {
         const response = await fetch(`${API_URL}/${id}`, { 
             method: "DELETE",
             headers: {
-                'Content-Type': 'application/json'
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}` // Incluir el token en el encabezado
             }
         });
 
