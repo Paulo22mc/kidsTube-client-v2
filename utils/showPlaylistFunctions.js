@@ -41,11 +41,25 @@ function getSessionUser() {
     }
 }
 
-// solicitud para obtener playlist
+// Solicitud para obtener playlist (con token)
 async function fetchPlaylists(parentId) {
+    const token = sessionStorage.getItem("token");
+    if (!token) {
+        alert("Authentication token not found. Please log in again.");
+        window.location.href = '/index.html';
+        return [];
+    }
+
     try {
-        const response = await fetch(`${API_URL}?parentId=${parentId}`);
+        const response = await fetch(`${API_URL}?parentId=${parentId}`, {
+            method: 'GET',
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        });
+
         if (!response.ok) throw new Error("Failed to fetch playlists");
+
         const result = await response.json();
         return result.data || [];
     } catch (error) {
@@ -107,22 +121,30 @@ function renderPlaylists(playlists) {
     `).join('');
 }
 
-// eliminar playlist
+// Eliminar playlist (con token)
 async function deletePlaylist(playlistId, buttonElement) {
+    const token = sessionStorage.getItem("token");
+    if (!token) {
+        alert("Authentication token not found. Please log in again.");
+        window.location.href = '/index.html';
+        return;
+    }
+
     try {
         if (!confirm('Are you sure you want to delete this playlist?')) return;
 
-        // Deshabilita el botón mientras la acción está en progreso
         buttonElement.disabled = true;
         buttonElement.textContent = "Removing...";
 
         const response = await fetch(`${API_URL}/${playlistId}`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
         });
 
         if (!response.ok) throw new Error("Error deleting playlist.");
 
-        // Eliminam el contenedor
         const cardElement = buttonElement.closest('.col');
         if (cardElement) cardElement.remove();
 

@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     const token = localStorage.getItem('token') || sessionStorage.getItem('token');
     const commonHeaders = {
         'Content-Type': 'application/json',
-        ...(token && { 'Authorization': `Bearer ${token}` })
+        'Authorization': `Bearer ${token}` 
     };
 
     // crear cartas de perfil

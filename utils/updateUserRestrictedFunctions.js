@@ -17,8 +17,21 @@ function getUserIdFromUrl() {
 
 // Función para obtener el usuario por ID
 async function getUserById(userId) {
+    const token = sessionStorage.getItem("token");
+    if (!token) {
+        alert("Authentication token not found. Please log in again.");
+        window.location.href = '/index.html';
+        return null;
+    }
+
     try {
-        const response = await fetch(`${API_URL}/${userId}`);
+        const response = await fetch(`${API_URL}/${userId}`, {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        });
+
         if (!response.ok) throw new Error("Error al obtener el usuario");
 
         const userData = await response.json();
@@ -28,7 +41,6 @@ async function getUserById(userId) {
         return null;
     }
 }
-
 // Función para llenar el formulario con los datos del usuario
 /*async function fillForm() {
     const userId = getUserIdFromUrl();
@@ -112,6 +124,7 @@ async function fillForm() {
 }
 
 // Función para actualizar el usuario (modificada para manejar PIN opcional)
+// Función para actualizar el usuario
 async function updateUser(event) {
     event.preventDefault();
 
@@ -121,13 +134,18 @@ async function updateUser(event) {
         return;
     }
 
-    // Preparar objeto con datos a actualizar
+    const token = sessionStorage.getItem("token");
+    if (!token) {
+        alert("Authentication token not found. Please log in again.");
+        window.location.href = '/index.html';
+        return;
+    }
+
     const updatedData = {
         fullName: document.getElementById("fullName").value,
         avatar: document.getElementById("avatar").value || user.avatar
     };
 
-    // Solo agregar el PIN si se proporcionó uno nuevo
     const newPin = document.getElementById("pin").value;
     if (newPin) {
         updatedData.pin = newPin;
@@ -138,6 +156,7 @@ async function updateUser(event) {
             method: "PATCH",
             headers: {
                 "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
             },
             body: JSON.stringify(updatedData),
         });

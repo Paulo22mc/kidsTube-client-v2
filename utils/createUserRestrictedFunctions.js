@@ -63,11 +63,21 @@ document.addEventListener("DOMContentLoaded", function () {
 
         console.log("User Data:", userData);
 
+        // Obtener el token JWT del sessionStorage
+        const token = sessionStorage.getItem("token");
+        if (!token) {
+            alert("Authentication token not found. Please log in again.");
+            window.location.href = '/index.html';
+            return;
+        }
+
+
         try {
             const response = await fetch('http://localhost:3001/api/user', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    "Authorization": `Bearer ${token}` 
                 },
                 body: JSON.stringify(userData)
             });
@@ -95,6 +105,6 @@ document.addEventListener("DOMContentLoaded", function () {
 window.addEventListener("DOMContentLoaded", () => {
     const user = sessionStorage.getItem('user');
     if (!user) {
-        window.location.href = '/index.html'; 
+        window.location.href = '/index.html';
     }
 });

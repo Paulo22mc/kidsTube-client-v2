@@ -1,4 +1,12 @@
 document.addEventListener("DOMContentLoaded", function () {
+
+    // Validación del token al iniciar
+    const token = sessionStorage.getItem("token");
+    if (!token) {
+        alert("Authentication token not found. Please log in again.");
+        window.location.href = '/index.html';
+        return;
+    }
     const profilesContainer = document.getElementById("profilesContainer");
     const videosContainer = document.getElementById("videosContainer");
 
@@ -12,29 +20,23 @@ document.addEventListener("DOMContentLoaded", function () {
     const parent = JSON.parse(parentData);
     console.log("Parent user:", parent);
 
+
+
     // Función para obtener los perfiles y videos de la API
     async function getUserData() {
         try {
-            // Obtener el token JWT del sessionStorage
-            const token = sessionStorage.getItem("token");
-            if (!token) {
-                alert("Authentication token not found. Please log in again.");
-                window.location.href = '/index.html';
-                return;
-            }
-
             // Solicitud para obtener los perfiles
             const profileResponse = await fetch(`http://localhost:3001/api/user/parent/${parent.id}`, {
                 method: "GET",
                 headers: {
-                    "Authorization": `Bearer ${token}` // Incluir el token en el encabezado
+                    "Authorization": `Bearer ${token}`
                 }
-            }); if (!profileResponse.ok) {
+            });
+            if (!profileResponse.ok) {
                 throw new Error('Error getting restricted user');
             }
             const profiles = await profileResponse.json();
             console.log("Restrcted users:", profiles);
-
 
             // Solicitud para obtener los videos
             const videoResponse = await fetch(`http://localhost:3001/api/video?parentId=${parent.id}`, {
@@ -42,7 +44,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 headers: {
                     "Authorization": `Bearer ${token}` // Incluir el token en el encabezado
                 }
-            }); if (!videoResponse.ok) {
+            });
+            if (!videoResponse.ok) {
                 throw new Error('Error getting videos');
             }
             const videos = await videoResponse.json();
@@ -101,7 +104,6 @@ document.addEventListener("DOMContentLoaded", function () {
     function renderVideos(videos) {
         videosContainer.innerHTML = "";
 
-        // Crear contenedor grid compacto
         const gridContainer = document.createElement("div");
         gridContainer.className = "row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 g-2";
 
@@ -125,7 +127,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
             col.innerHTML = `
                 <div class="card video-card h-100">
-                    <!-- Miniatura compacta con checkbox -->
                     <div class="ratio ratio-16x9 position-relative">
                         <img src="https://img.youtube.com/vi/${youtubeId}/mqdefault.jpg" 
                              class="card-img-top" alt="${video.name}"
@@ -136,8 +137,6 @@ document.addEventListener("DOMContentLoaded", function () {
                                    class="form-check-input video-checkbox">
                         </div>
                     </div>
-                    
-                    <!-- Cuerpo compacto -->
                     <div class="card-body p-2">
                         <h6 class="card-title text-truncate mb-1" title="${video.name}">${video.name}</h6>
                         <small class="card-text text-muted text-truncate d-block" 
@@ -162,10 +161,9 @@ document.addEventListener("DOMContentLoaded", function () {
         return (match && match[2].length === 11) ? match[2] : null;
     }
 
-    // Llamar a la función para obtener los datos del usuario
     getUserData();
 
-    // Manejar el envío del formulario (se mantiene igual)
+    // Manejar el envío del formulario
     document.getElementById("playlistForm").addEventListener("submit", function (e) {
         e.preventDefault();
 
@@ -200,7 +198,9 @@ document.addEventListener("DOMContentLoaded", function () {
         fetch('http://localhost:3001/api/playlist', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+
             },
             body: JSON.stringify(playlist)
         })
@@ -211,7 +211,6 @@ document.addEventListener("DOMContentLoaded", function () {
                     document.getElementById("playlistForm").reset();
                     document.querySelectorAll('.profile-checkbox, .video-checkbox').forEach(cb => cb.checked = false);
                     window.location.href = "./showPlaylist.html";
-
                 } else {
                     alert(`Error: ${data.message}`);
                 }

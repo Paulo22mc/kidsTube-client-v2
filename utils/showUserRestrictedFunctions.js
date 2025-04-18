@@ -25,13 +25,26 @@ function getUserIdFromSession() {
     }
 }
 
-// obtener los usuarios registrados del padre
+// Obtener los usuarios registrados del padre (con token)
 async function getUsers() {
     const parentId = getUserIdFromSession();
     if (!parentId) return [];
 
+    const token = sessionStorage.getItem("token");
+    if (!token) {
+        alert("Authentication token not found. Please log in again.");
+        window.location.href = '/index.html';
+        return [];
+    }
+
     try {
-        const response = await fetch(`${API_URL}/parent/${parentId}`);
+        const response = await fetch(`${API_URL}/parent/${parentId}`, {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        });
+
         if (!response.ok) throw new Error("Error getting users");
 
         const users = await response.json();
@@ -41,6 +54,7 @@ async function getUsers() {
         return [];
     }
 }
+
 
 // mostrar los usuarios en la página
 async function renderUsers() {
@@ -84,8 +98,20 @@ async function renderUsers() {
 async function deleteUser(userId) {
     if (!confirm("Are you sure you want to delete this user?")) return;
 
+    const token = sessionStorage.getItem("token");
+    if (!token) {
+        alert("Authentication token not found. Please log in again.");
+        window.location.href = '/index.html';
+        return;
+    }
+
     try {
-        const response = await fetch(`${API_URL}/${userId}`, { method: "DELETE" });
+        const response = await fetch(`${API_URL}/${userId}`, {
+            method: "DELETE",
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        });
 
         if (response.ok) {
             console.log("User deleted successfully.");
@@ -97,6 +123,7 @@ async function deleteUser(userId) {
         console.error("Error deleting user:", error);
     }
 }
+
 
 // Ejecutar la carga de usuarios cuando se cargue la página
 document.addEventListener("DOMContentLoaded", renderUsers);
