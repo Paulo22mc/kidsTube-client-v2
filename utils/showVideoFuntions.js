@@ -1,4 +1,5 @@
 const API_URL = "http://localhost:3001/api/video"; 
+const GRAPHQL_API_URL = "http://localhost:4000/graphql"; 
 
 // Verificar si el usuario esta logueado
 window.addEventListener("DOMContentLoaded", () => {
@@ -44,26 +45,50 @@ async function getVideos() {
         return [];
     }
 
-    try {
-        const response = await fetch(`${API_URL}?parentId=${userId}`, {
-            method: "GET",
-            headers: {
-                "Authorization": `Bearer ${token}` 
+    const query = `
+        query GetVideos($parentId: ID!) {
+            videos(parentId: $parentId) {
+                id
+                name
+                url
+                description
             }
-        });
-        if (!response.ok) throw new Error("Error getting videos");
+        }
+    `;
 
-        const videos = await response.json();
-        
+    try {
+        const response = await fetch(GRAPHQL_API_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}` // Incluir el token en el encabezado
+            },
+            body: JSON.stringify({
+                query,
+                variables: { parentId: userId },
+            }),
+        });
+
+        if (!response.ok) throw new Error("Error fetching videos");
+
+        const { data, errors } = await response.json();
+
+        if (errors) {
+            console.error("GraphQL errors:", errors);
+            return [];
+        }
+
+        const videos = data.videos;
+
         videos.forEach(video => {
-            if (!video._id) {
+            if (!video.id) {
                 console.error("Video without _id:", video);
             }
         });
 
         return videos;
     } catch (error) {
-        console.error(error);
+        console.error("Error fetching videos:", error);
         return [];
     }
 }
@@ -141,7 +166,7 @@ async function renderVideos() {
         videoListContainer.innerHTML = ""; 
 
         videos.forEach((video) => {
-            if (!video._id) {
+            if (!video.id) {
                 console.error("Video without valid ID:", video);
                 return;
             }
@@ -164,7 +189,7 @@ async function renderVideos() {
                     <div class="card-body">
                         <h5 class="card-title">${video.name}</h5>
                         <p class="card-text">${video.description}</p>
-                        <a href="./update.html?id=${video._id}" class="btn btn-warning btn-sm">Edit</a>
+                        <a href="./update.html?id=${video.id}" class="btn btn-warning btn-sm">Edit</a>
                     </div>
                 </div>
             `;
@@ -172,7 +197,7 @@ async function renderVideos() {
             const deleteButton = document.createElement("button");
             deleteButton.classList.add("btn", "btn-danger", "btn-sm", "ms-2");
             deleteButton.textContent = "Delete";
-            deleteButton.addEventListener("click", () => deleteVideo(video._id));
+            deleteButton.addEventListener("click", () => deleteVideo(video.id));
 
             videoElement.querySelector(".card-body").appendChild(deleteButton);
             videoListContainer.appendChild(videoElement);
