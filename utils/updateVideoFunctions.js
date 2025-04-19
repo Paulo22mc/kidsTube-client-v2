@@ -39,28 +39,44 @@ document.addEventListener('DOMContentLoaded', async function() {
 });
 
 // cargar informacion de videos a los inputs
-async function loadVideoData(videoId, parentId) {
+async function loadVideoData(videoId) {
     try {
-        const response = await fetch(`http://localhost:3001/api/video?parentId=${parentId}`);
-        
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`Error ${response.status}: ${errorText}`);
+        const query = `
+            query GetVideo($id: ID!) {
+                video(id: $id) {
+                    id
+                    name
+                    url
+                    description
+                }
+            }
+        `;
+
+        const response = await fetch('http://localhost:4000/graphql', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+            },
+            body: JSON.stringify({
+                query,
+                variables: { id: videoId }
+            })
+        });
+
+        const result = await response.json();
+
+        if (result.errors) {
+            throw new Error(result.errors[0].message);
         }
 
-        const videos = await response.json();
-        const video = videos.find(v => v._id === videoId);
-        
-        if (!video) {
-            throw new Error('Video not found in user list');
-        }
+        return result.data.video;
 
-        return video;
-        
     } catch (error) {
-        throw new Error(`The video could not be loaded: ${error.message}`);
+        throw new Error(`El video no pudo ser cargado: ${error.message}`);
     }
 }
+
 
 
 // actualizar video
@@ -88,7 +104,7 @@ async function updateVideo(videoId) {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${JSON.parse(sessionStorage.getItem('user')).token}`
+                'Authorization': `Bearer ${sessionStorage.getItem('token')}`
             },
             body: JSON.stringify({ name, url, description })
         });
