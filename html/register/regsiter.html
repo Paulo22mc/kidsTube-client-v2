@@ -26,70 +26,66 @@
                                 <div class="card-body p-md-5 text-black">
                                     <h1 class="mb-5 text-uppercase text-center">User Registration</h1>
 
-                                    <!-- Form Fields -->
-                                    <div class="row">
-                                        <div class="col-md-6 mb-4">
-                                            <div data-mdb-input-init class="form-outline">
-                                                <label class="form-label" for="firstName">First Name</label>
-                                                <input type="text" id="firstName" class="form-control form-control-lg"
-                                                    required />
+                                    <!-- Formulario con ID -->
+                                    <form id="registerForm">
+                                        <!-- Form Fields -->
+                                        <div class="row">
+                                            <div class="col-md-6 mb-4">
+                                                <div data-mdb-input-init class="form-outline">
+                                                    <label class="form-label" for="firstName">First Name</label>
+                                                    <input type="text" id="firstName" class="form-control form-control-lg" required />
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 mb-4">
+                                                <div data-mdb-input-init class="form-outline">
+                                                    <label class="form-label" for="lastName">Last Name</label>
+                                                    <input type="text" id="lastName" class="form-control form-control-lg" required />
+                                                </div>
                                             </div>
                                         </div>
-                                        <div class="col-md-6 mb-4">
-                                            <div data-mdb-input-init class="form-outline">
-                                                <label class="form-label" for="lastName">Last Name</label>
-                                                <input type="text" id="lastName" class="form-control form-control-lg"
-                                                    required />
-                                            </div>
+
+                                        <div data-mdb-input-init class="form-outline mb-4">
+                                            <label class="form-label" for="email">Email</label>
+                                            <input type="email" id="email" class="form-control form-control-lg" required />
                                         </div>
-                                    </div>
 
-                                    <div data-mdb-input-init class="form-outline mb-4">
-                                        <label class="form-label" for="email">Email</label>
-                                        <input type="email" id="email" class="form-control form-control-lg" required />
-                                    </div>
+                                        <div data-mdb-input-init class="form-outline mb-4">
+                                            <label class="form-label" for="password">Password</label>
+                                            <input type="password" id="password" class="form-control form-control-lg" required />
+                                        </div>
 
-                                    <div data-mdb-input-init class="form-outline mb-4">
-                                        <label class="form-label" for="password">Password</label>
-                                        <input type="password" id="password" class="form-control form-control-lg"
-                                            required />
-                                    </div>
+                                        <div data-mdb-input-init class="form-outline mb-4">
+                                            <label class="form-label" for="repeatPassword">Repeat Password</label>
+                                            <input type="password" id="repeatPassword" class="form-control form-control-lg" required />
+                                        </div>
 
-                                    <div data-mdb-input-init class="form-outline mb-4">
-                                        <label class="form-label" for="repeatPassword">Repeat Password</label>
-                                        <input type="password" id="repeatPassword" class="form-control form-control-lg"
-                                            required />
-                                    </div>
+                                        <div data-mdb-input-init class="form-outline mb-4">
+                                            <label class="form-label" for="phone">Phone Number</label>
+                                            <input type="text" id="phone" class="form-control form-control-lg" required />
+                                        </div>
 
-                                    <div data-mdb-input-init class="form-outline mb-4">
-                                        <label class="form-label" for="phone">Phone Number</label>
-                                        <input type="text" id="phone" class="form-control form-control-lg" required />
-                                    </div>
+                                        <div data-mdb-input-init class="form-outline mb-4">
+                                            <label class="form-label" for="pin">PIN</label>
+                                            <input type="password" id="pin" class="form-control form-control-lg" required />
+                                        </div>
 
-                                    <div data-mdb-input-init class="form-outline mb-4">
-                                        <label class="form-label" for="pin">PIN</label>
-                                        <input type="password" id="pin" class="form-control form-control-lg" required />
-                                    </div>
+                                        <div class="form-outline mb-4">
+                                            <label class="form-label" for="country">Country</label>
+                                            <select id="country" class="form-control form-control-lg">
+                                                <option value="">Select a country</option>
+                                            </select>
+                                        </div>
 
-                                    <div class="form-outline mb-4">
-                                        <label class="form-label" for="country">Country</label>
-                                        <select id="country" class="form-control form-control-lg">
-                                            <option value="">Select a country</option>
-                                        </select>
-                                    </div>
-                                    
+                                        <div data-mdb-input-init class="form-outline mb-4">
+                                            <label class="form-label" for="birthday">Birth Date</label>
+                                            <input type="date" id="birthday" class="form-control form-control-lg" required />
+                                        </div>
 
-                                    <div data-mdb-input-init class="form-outline mb-4">
-                                        <label class="form-label" for="birthday">Birth Date</label>
-                                        <input type="date" id="birthday" class="form-control form-control-lg"
-                                            required />
-                                    </div>
-
-                                    <div class="d-flex justify-content-end pt-3">
-                                        <a data-mdb-button-init data-mdb-ripple-init class="btn btn-light btn-lg"
-                                            href="../../index.html">Go back</a>
-                                        <button type="button" class="btn btn-warning btn-lg ms-2" id="registerButton">Register</button>
-                                    </div>
+                                        <div class="d-flex justify-content-end pt-3">
+                                            <a data-mdb-button-init data-mdb-ripple-init class="btn btn-light btn-lg" href="../../index.html">Go back</a>
+                                            <button type="button" class="btn btn-warning btn-lg ms-2" id="registerButton">Register</button>
+                                        </div>
+                                    </form>
                                 </div>
                             </div>
                         </div>

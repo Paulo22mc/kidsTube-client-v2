@@ -55,6 +55,20 @@
                                         
                                     </form>
 
+                                    <div id="verificationForm" style="display: none;">
+                                        <h4 class="text-center mb-4">Enter Verification Code</h4>
+                                        <div class="form-outline mb-4">
+                                            <label class="form-label" for="pinInput">Verification Code</label>
+                                            <input type="text" id="pinInput" class="form-control" placeholder="Enter the code sent to your phone" required />
+                                        </div>
+                                        <div id="error-message" style="color: red; display: none;" class="mb-4"></div>
+                                        <div class="text-center">
+                                            <button class="btn btn-primary btn-block fa-lg gradient-custom-2 mb-3" id="verifyButton" type="button">
+                                                Verify Code
+                                            </button>
+                                        </div>
+                                    </div>
+
                                 </div>
                             </div>
                             <div class="col-lg-6 d-flex align-items-center gradient-custom-2">
