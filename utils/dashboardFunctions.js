@@ -2,18 +2,9 @@ document.addEventListener("DOMContentLoaded", () => {
     renderUsers();
 });
 
-const API_URL = "http://localhost:3001/api/user";
-const API_URL2 = "http://localhost:3001/api/register";
+const GRAPHQL_URL = "http://localhost:4000/graphql";
+
 let selectedUserId = null;
-
-// Verificar si el usuario esta logueado
-window.addEventListener("DOMContentLoaded", () => {
-    const user = sessionStorage.getItem('user');
-    if (!user) {
-        window.location.href = '/index.html'; 
-    }
-});
-
 
 // Obtener el ID del usuario en sesión
 function getUserIdFromSession() {
@@ -31,10 +22,37 @@ function getUserIdFromSession() {
 async function getUsers() {
     const parentId = getUserIdFromSession();
     if (!parentId) return [];
+
+    const query = `
+    query GetRestrictedUsersByParent($parentId: ID!) {
+        getRestrictedUsersByParent(parentId: $parentId) {
+            id
+            fullName
+            avatar
+        }
+    }
+    `;
+    const variables = { parentId };
+
+
     try {
-        const response = await fetch(`${API_URL}/parent/${parentId}`);
-        if (!response.ok) throw new Error("Error getting users");
-        return await response.json();
+        const response = await fetch(GRAPHQL_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+            },
+            body: JSON.stringify({ query, variables }),
+        });
+
+        const result = await response.json();
+
+        if (result.errors) {
+            console.error("GraphQL errors:", result.errors);
+            throw new Error("Error fetching users");
+        }
+        return result.data.getRestrictedUsersByParent || [];
+    
     } catch (error) {
         console.error(error);
         return [];
@@ -62,17 +80,16 @@ async function renderUsers() {
                     <img src="${user.avatar ? '../../images/avatars/' + user.avatar : '/images/avatars/default-avatar.png'}" 
                          alt="Avatar" class="rounded-circle mb-3" width="145">
                     <h5 class="card-title fw-bold">${user.fullName}</h5>
-                    <button class="btn btn-outline-light btn-sm d-flex align-items-center justify-content-center gap-1" data-user-id="${user._id}">
+                    <button class="btn btn-outline-light btn-sm d-flex align-items-center justify-content-center gap-1" data-user-id="${user.id}">
                         <i class="bi bi-box-arrow-in-right"></i> Enter
                     </button>
                 </div>
             </div>
         `;
-
-
-        userListContainer.classList.add("d-flex", "justify-content-center", "flex-wrap", "gap-4");
         userListContainer.appendChild(userElement);
     });
+
+    userListContainer.classList.add("d-flex", "justify-content-center", "flex-wrap", "gap-4");
 
     // Agregar el eventListener al botón "Enter"
     const enterButtons = document.querySelectorAll('.btn-outline-light');
@@ -80,20 +97,25 @@ async function renderUsers() {
     enterButtons.forEach(button => {
         button.addEventListener('click', function (event) {
             const userRestrictedId = event.target.getAttribute('data-user-id');
-            openPinModalUser(userRestrictedId);  // Abre el modal con el ID del usuario restringido
+            openPinModalUser(userRestrictedId);  
         });
     });
-
-
-
 }
 
 // Abrir modal de PIN para el usuario restringido
 function openPinModalUser(userRestrictedId) {
-    selectedUserId = userRestrictedId;  // Guardar el ID del usuario restringido
+    selectedUserId = userRestrictedId;  
     const pinModal = new bootstrap.Modal(document.getElementById("pinModalUsers"));
     pinModal.show();
 }
+
+// Redirección si no hay usuario logueado
+window.addEventListener("DOMContentLoaded", () => {
+    const user = sessionStorage.getItem('token');
+    if (!user) {
+        window.location.href = '/index.html';
+    }
+});
 
 // Confirmar PIN del usuario padre
 document.getElementById("confirmPinParent").addEventListener("click", function () {
@@ -105,14 +127,13 @@ document.getElementById("confirmPinParent").addEventListener("click", function (
         return;
     }
 
-    validatePin(user.id, enteredPin, 'parent');
-
+    validatePin(user.id, enteredPin);
 });
 
-// Función para validar PIN de usuario padre
+// Validar PIN del padre
 async function validatePin(userId, enteredPin) {
     try {
-        const response = await fetch(`${API_URL2}/validate`, {
+        const response = await fetch(`http://localhost:3001/api/register/validate`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -121,7 +142,6 @@ async function validatePin(userId, enteredPin) {
             body: JSON.stringify({ userId, enteredPin })
         });
 
-        // Verificar si la respuesta es JSON
         const contentType = response.headers.get('content-type');
         if (!contentType || !contentType.includes('application/json')) {
             const text = await response.text();
@@ -141,13 +161,13 @@ async function validatePin(userId, enteredPin) {
         }
     } catch (error) {
         console.error("Error validating PIN:", error);
-        alert(error.message || "There was an error while trying to validate the PIN.");
+        alert(error.message || "Error al validar el PIN.");
     }
 }
-// Confirmar PIN del usuario restringido (modificado)
+
 document.getElementById("confirmPinRestricted").addEventListener("click", async function () {
     const enteredPin = document.getElementById("pinInputRestricted").value.trim();
-
+    
     if (!selectedUserId) {
         alert("A restricted user has not been selected.");
         return;
@@ -158,12 +178,19 @@ document.getElementById("confirmPinRestricted").addEventListener("click", async 
         return;
     }
 
+    const token = sessionStorage.getItem("token");
+    if (!token) {
+        alert("Authentication token not found. Please log in again.");
+        window.location.href = '/index.html';
+        return;
+    }
     try {
-        const response = await fetch(`${API_URL}/validate-pin`, {
+
+        const response = await fetch(`http://localhost:3001/api/restricted/validate-pin`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+                'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify({
                 userId: selectedUserId,
@@ -171,7 +198,6 @@ document.getElementById("confirmPinRestricted").addEventListener("click", async 
             })
         });
 
-        // Verificar si la respuesta es JSON
         const contentType = response.headers.get('content-type');
         if (!contentType || !contentType.includes('application/json')) {
             const text = await response.text();
@@ -185,10 +211,7 @@ document.getElementById("confirmPinRestricted").addEventListener("click", async 
         }
 
         if (result.success) {
-            // Almacenar datos del usuario restringido en sessionStorage
-            sessionStorage.setItem('restrictedUser', JSON.stringify(result.user));
-
-            // Redirigir al dashboard del usuario restringido
+            // Redirigir al dashboard del usuario restringido sin guardar en sessionStorage
             window.location.href = `/html/dashboard/userDashboard.html?id=${selectedUserId}`;
         } else {
             alert(result.error || "PIN incorrecto");

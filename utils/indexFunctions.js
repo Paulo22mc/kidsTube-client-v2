@@ -27,7 +27,7 @@ const loginUser = async (email, password) => {
 };
 
 
-const validatePin = async (userId, enteredPin) => {
+const validateCode = async (userId, enteredPin) => {
     try {
         if (!enteredPin || enteredPin.length < 6) {
             throw new Error('El código debe tener 6 dígitos');
@@ -88,7 +88,7 @@ const showVerificationForm = (userId) => {
 
     document.getElementById('verifyButton').onclick = () => {
         const enteredPin = document.getElementById('pinInput').value;
-        validatePin(userId, enteredPin);
+        validateCode(userId, enteredPin);
     };
 };
 
