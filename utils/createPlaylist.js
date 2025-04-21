@@ -21,35 +21,55 @@ document.addEventListener("DOMContentLoaded", function () {
     console.log("Parent user:", parent);
 
 
+    async function graphqlRequest(query, variables = {}) {
+        try {
+            const response = await fetch('http://localhost:4000/graphql', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ query, variables })
+            });
+
+            const { data, errors } = await response.json();
+
+            if (errors) {
+                console.error("GraphQL errors:", errors);
+                throw new Error(errors[0].message || "GraphQL request failed");
+            }
+
+            return data;
+        } catch (error) {
+            console.error("GraphQL request error:", error);
+            throw error;
+        }
+    }
 
     // Función para obtener los perfiles y videos de la API
     async function getUserData() {
         try {
-            // Solicitud para obtener los perfiles
-            const profileResponse = await fetch(`http://localhost:3001/api/user/parent/${parent.id}`, {
-                method: "GET",
-                headers: {
-                    "Authorization": `Bearer ${token}`
+            const query = `
+                query GetUserData($parentId: ID!) {
+                    getRestrictedUsersByParent(parentId: $parentId) {
+                        id
+                        fullName
+                    }
+                    videos(parentId: $parentId) {
+                        id
+                        name
+                        url
+                        description
+                    }
                 }
-            });
-            if (!profileResponse.ok) {
-                throw new Error('Error getting restricted user');
-            }
-            const profiles = await profileResponse.json();
-            console.log("Restrcted users:", profiles);
+            `;
 
-            // Solicitud para obtener los videos
-            const videoResponse = await fetch(`http://localhost:3001/api/video?parentId=${parent.id}`, {
-                method: "GET",
-                headers: {
-                    "Authorization": `Bearer ${token}` // Incluir el token en el encabezado
-                }
-            });
-            if (!videoResponse.ok) {
-                throw new Error('Error getting videos');
-            }
-            const videos = await videoResponse.json();
-            console.log("Videos:", videos);
+            const variables = { parentId: parent.id };
+
+            const data = await graphqlRequest(query, variables);
+
+            const profiles = data.getRestrictedUsersByParent || [];
+            const videos = data.videos || [];
 
             renderProfiles(profiles);
             renderVideos(videos);
@@ -60,17 +80,18 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
+
     // Función para mostrar perfiles 
     function renderProfiles(profiles) {
         profilesContainer.innerHTML = "";
 
         if (profiles.length === 0) {
             profilesContainer.innerHTML = `
-                <div class="alert alert-info">
-                    You have no registered child profiles.
-                    <a href="../user/registrarUser.html">New restricted user</a>
-                </div>
-            `;
+            <div class="alert alert-info">
+                There are not profiles restricteds. 
+                <a href="../userRrestricted/createUser.html">Create</a>
+            </div>
+        `;
             return;
         }
 
@@ -82,9 +103,9 @@ document.addEventListener("DOMContentLoaded", function () {
             profileItem.className = "list-group-item";
             profileItem.innerHTML = `
                 <div class="form-check">
-                    <input type="checkbox" value="${profile._id}" id="profile-${profile._id}" 
+                    <input type="checkbox" value="${profile.id}" id="profile-${profile.id}" 
                            class="form-check-input profile-checkbox">
-                    <label for="profile-${profile._id}" class="form-check-label w-100">
+                    <label for="profile-${profile.id}" class="form-check-label w-100">
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
                                 <i class="bi bi-person-fill me-2"></i> 
@@ -109,12 +130,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (videos.length === 0) {
             videosContainer.innerHTML = `
-                <div class="col-12">
-                    <div class="alert alert-info text-center py-2">
-                        <i class="bi bi-film me-2"></i> No hay videos disponibles
-                    </div>
-                </div>
-            `;
+            <div class="alert alert-info">
+                There are not videos restricteds. 
+                <a href="../video/create.html">Create</a>
+            </div>
+        `;
             return;
         }
 
@@ -132,8 +152,8 @@ document.addEventListener("DOMContentLoaded", function () {
                              class="card-img-top" alt="${video.name}"
                              style="object-fit: cover;">
                         <div class="position-absolute top-0 end-0 m-1">
-                            <input type="checkbox" value="${video._id}" 
-                                   id="video-${video._id}" 
+                            <input type="checkbox" value="${video.id}" 
+                                   id="video-${video.id}" 
                                    class="form-check-input video-checkbox">
                         </div>
                     </div>
