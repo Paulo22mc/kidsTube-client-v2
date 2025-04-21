@@ -179,11 +179,21 @@ async function renderVideos() {
 
             const videoElement = document.createElement("div");
             videoElement.classList.add("col-md-4", "mb-4");
+            
+            // URL segura para el iframe
+            const embedUrl = new URL(`https://www.youtube.com/embed/${youtubeId}`);
+            embedUrl.searchParams.append('enablejsapi', '0');
+            embedUrl.searchParams.append('origin', window.location.origin);
+            
             videoElement.innerHTML = `
                 <div class="card">
                     <div class="ratio ratio-16x9">
-                        <iframe src="https://www.youtube.com/embed/${youtubeId}" 
-                            frameborder="0" allowfullscreen>
+                        <iframe src="${embedUrl.toString()}" 
+                            frameborder="0" 
+                            allowfullscreen
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
+                            loading="lazy">
                         </iframe>
                     </div>
                     <div class="card-body">
@@ -208,6 +218,5 @@ async function renderVideos() {
         videoListContainer.innerHTML = `<p class="text-danger">Error loading videos: ${error.message}</p>`;
     }
 }
-
 // Ejecutar la carga de videos cuando se cargue la página
 document.addEventListener("DOMContentLoaded", renderVideos);
