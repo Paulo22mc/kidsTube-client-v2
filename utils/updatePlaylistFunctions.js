@@ -1,10 +1,11 @@
-const API_URL = 'http://localhost:3001/api';
+const API_URL = 'http://localhost:3001/api/playlist';
+const GRAPHQL_API_URL = 'http://localhost:4000/graphql';
 
 // Verificar si el usuario esta logueado
 window.addEventListener("DOMContentLoaded", () => {
-    const user = sessionStorage.getItem('user');
-    if (!user) {
-        window.location.href = '/index.html'; 
+    const token = sessionStorage.getItem('token');
+    if (!token) {
+        window.location.href = '/index.html';
     }
 });
 
@@ -29,55 +30,87 @@ document.addEventListener('DOMContentLoaded', async function () {
         return;
     }
 
-    // Configuración de headers
-    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-    const commonHeaders = {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}` 
-    };
+    // Función para realizar solicitudes GraphQL
+    async function graphqlRequest(query, variables = {}) {
+        const token = sessionStorage.getItem('token');
+        if (!token) {
+            alert("Authentication token not found. Please log in again.");
+            window.location.href = '/index.html';
+            return null;
+        }
+
+        try {
+            const response = await fetch(GRAPHQL_API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ query, variables })
+            });
+
+            if (response.status === 401) {
+                alert("Session expired. Please log in again.");
+                window.location.href = '/index.html';
+                return null;
+            }
+
+            const { data, errors } = await response.json();
+            if (errors) {
+                console.error("GraphQL errors:", errors);
+                throw new Error(errors[0].message || "GraphQL request failed");
+            }
+
+            return data;
+        } catch (error) {
+            console.error("GraphQL request error:", error);
+            throw error;
+        }
+    }
 
     // crear cartas de perfil
     function renderProfiles(profiles, selectedProfiles = []) {
         if (!profilesContainer) return;
-
-        const loadingElement = document.getElementById('loadingProfiles');
-        if (loadingElement) loadingElement.remove();
-
+    
+        // Limpiar contenedor
+        profilesContainer.innerHTML = '';
+    
         if (profiles.length === 0) {
             profilesContainer.innerHTML = `
-            <div class="alert alert-info">
-                There are not profiles restricteds. 
-                <a href="../html/userRrestricted/createUser.html">Create</a>
-            </div>
-        `;
+                <div class="alert alert-info">
+                    No hay perfiles disponibles.
+                    <a href="../userRrestricted/createUser.html">Crear perfil</a>
+                </div>`;
             return;
         }
-
+    
         const profileList = document.createElement("div");
         profileList.className = "list-group";
-
+    
         profiles.forEach(profile => {
+            const normalizedSelected = selectedProfiles.map(id => id.toString());
+            const profileId = (profile.id || profile._id).toString();
+            const isSelected = normalizedSelected.includes(profileId);
+
+            console.log(`Profile ID: ${profileId}, Is Selected: ${isSelected}`);
+
             const profileItem = document.createElement("div");
             profileItem.className = "list-group-item";
             profileItem.innerHTML = `
-            <div class="form-check">
-                <input type="checkbox" value="${profile._id}" id="profile-${profile._id}" 
-                       class="form-check-input profile-checkbox"
-                       ${selectedProfiles.includes(profile._id) ? 'checked' : ''}>
-                <label for="profile-${profile._id}" class="form-check-label w-100">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <i class="bi bi-person-fill me-2"></i> 
-                            <strong>${profile.fullName || profile.name || `Profile ${profile._id.substring(0, 6)}`}</strong>
-                            <span class="text-muted ms-2">${profile.age || ''} ${profile.age ? 'años' : ''}</span>
-                        </div>
-                        ${profile.restrictionLevel ? `<small class="badge bg-primary">${profile.restrictionLevel}</small>` : ''}
-                    </div>
-                </label>
-            </div>
-        `;
+                <div class="form-check">
+                    <input type="checkbox" 
+                           value="${profileId}" 
+                           id="profile-${profileId}" 
+                           class="form-check-input profile-checkbox"
+                           ${isSelected ? 'checked' : ''}>
+                    <label for="profile-${profileId}" class="form-check-label w-100">
+                        ${profile.fullName}
+                    </label>
+                </div>
+            `;
             profileList.appendChild(profileItem);
         });
+    
         profilesContainer.appendChild(profileList);
     }
 
@@ -90,12 +123,11 @@ document.addEventListener('DOMContentLoaded', async function () {
 
         if (videos.length === 0) {
             videosContainer.innerHTML = `
-                <div class="col-12">
-                    <div class="alert alert-info text-center py-2">
-                        <i class="bi bi-film me-2"></i> No videos available
-                    </div>
-                </div>
-            `;
+            <div class="alert alert-info">
+                There are not videos restricteds. 
+                <a href="../video/create.html">Create</a>
+            </div>
+        `;
             return;
         }
 
@@ -111,16 +143,16 @@ document.addEventListener('DOMContentLoaded', async function () {
             col.className = "col";
 
             col.innerHTML = `
-                <div class="card video-card h-100 ${selectedVideos.includes(video._id) ? 'border-primary' : ''}">
+                <div class="card video-card h-100 ${selectedVideos.includes(video.id) ? 'border-primary' : ''}">
                     <div class="ratio ratio-16x9 position-relative">
                         <img src="https://img.youtube.com/vi/${youtubeId}/mqdefault.jpg" 
                              class="card-img-top" alt="${video.name}"
                              style="object-fit: cover;">
                         <div class="position-absolute top-0 end-0 m-1">
-                            <input type="checkbox" value="${video._id}" 
-                                   id="video-${video._id}" 
+                            <input type="checkbox" value="${video.id}" 
+                                   id="video-${video.id}" 
                                    class="form-check-input video-checkbox"
-                                   ${selectedVideos.includes(video._id) ? 'checked' : ''}>
+                                   ${selectedVideos.includes(video.id) ? 'checked' : ''}>
                         </div>
                     </div>
                     
@@ -157,10 +189,14 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
 
     async function safeFetch(endpoint, options = {}) {
+        const token = sessionStorage.getItem('token');
         try {
             const response = await fetch(`${API_URL}${endpoint}`, {
                 ...options,
-                headers: commonHeaders
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
             });
 
             if (!response.ok) {
@@ -177,44 +213,90 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     async function loadInitialData() {
         try {
-            // Cargar videos y perfiles
-            const [videos, profiles] = await Promise.all([
-                safeFetch(`/video?parentId=${parent.id}`).catch(() => []),
-                safeFetch(`/user/parent/${parent.id}`).catch(() => [])
-            ]);
-            
-            //cargar la playlist existente
+            let playlistData = null;
             let selectedProfiles = [];
             let selectedVideos = [];
-            let playlistNameValue = '';
-
+    
             if (playlistId) {
-                const playlistData = await safeFetch(`/playlist/${playlistId}`).catch(() => null);
-                if (playlistData) {
-                    selectedProfiles = playlistData.profiles.map(p => p._id || p);
-                    selectedVideos = playlistData.videos.map(v => v._id || v);
-                    playlistNameValue = playlistData.name || '';
-
-                    if (playlistName) {
-                        playlistName.value = playlistNameValue;
+                const playlistQuery = `
+                    query GetPlaylist($id: ID!) {
+                        getPlaylist(id: $id) {
+                            id
+                            name
+                            profiles {
+                                id
+                                fullName
+                            }
+                            videos {
+                                id
+                                name
+                                url
+                                description
+                            }
+                        }
                     }
+                `;
+                
+                const result = await graphqlRequest(playlistQuery, { id: playlistId });
+                playlistData = result.getPlaylist;
+                
+                if (playlistData) {
+                    // Preparar arrays de IDs seleccionados
+                    selectedProfiles = playlistData.profiles.map(p => p.id);
+                    selectedVideos = playlistData.videos.map(v => v.id);
+                    
+                    // Establecer nombre de la playlist
+                    playlistName.value = playlistData.name || '';
                 }
             }
-
-            // Renderizar con los datos seleccionados
+    
+            // 2. Cargar todos los videos y perfiles disponibles
+            const videosQuery = `
+                query Videos($parentId: ID!) {
+                    videos(parentId: $parentId) {
+                        id
+                        name
+                        url
+                        description
+                    }
+                }
+            `;
+    
+            const profilesQuery = `
+                query GetRestrictedUsersByParent($parentId: ID!) {
+                    getRestrictedUsersByParent(parentId: $parentId) {
+                        id
+                        fullName
+                    }
+                }
+            `;
+    
+            const [videosResponse, profilesResponse] = await Promise.all([
+                graphqlRequest(videosQuery, { parentId: parent.id }),
+                graphqlRequest(profilesQuery, { parentId: parent.id })
+            ]);
+    
+            const videos = videosResponse.videos || [];
+            const profiles = profilesResponse.getRestrictedUsersByParent || [];
+    
+            // 3. Renderizar con los datos seleccionados
             renderVideos(videos, selectedVideos);
             renderProfiles(profiles, selectedProfiles);
-
-            // Actualizar UI según modo (edición/creación)
+    
+            console.log("Selected Profiles:", selectedProfiles);
+            console.log("Available Profiles:", profiles.map(profile => profile.id || profile._id));
+    
+            // 4. Actualizar UI según modo (edición/creación)
             if (playlistId) {
                 formTitle.textContent = 'Edit Playlist';
-                saveButton.innerHTML = '<i class="bi bi-save me-1"></i>Update Playlist';
+                saveButton.innerHTML = '<i class="bi bi-save me-1"></i> Update Playlist';
             } else {
                 formTitle.textContent = 'New Playlist';
-                saveButton.innerHTML = '<i class="bi bi-plus-circle me-1"></i>Create Playlist';
+                saveButton.innerHTML = '<i class="bi bi-plus-circle me-1"></i> Create Playlist';
             }
-
+    
         } catch (error) {
+            console.error('Error loading data:', error);
             showError(`Error loading data: ${error.message}`);
         }
     }
@@ -229,14 +311,14 @@ document.addEventListener('DOMContentLoaded', async function () {
             saveButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...';
 
             try {
-                // Obtener todos los checkboxes de videos (no solo los seleccionados)
+                // Obtener todos los checkboxes de videos 
                 const videoCheckboxes = Array.from(document.querySelectorAll('.video-checkbox'));
                 const selectedVideos = videoCheckboxes
                     .filter(cb => cb.checked)
                     .map(cb => isValidObjectId(cb.value) ? cb.value : cb.dataset.id || cb.value)
                     .filter(id => id);
 
-                // Obtener todos los checkboxes de perfiles (no solo los seleccionados)
+                // Obtener todos los checkboxes de perfiles 
                 const profileCheckboxes = Array.from(document.querySelectorAll('.profile-checkbox'));
                 const selectedProfiles = profileCheckboxes
                     .filter(cb => cb.checked)
@@ -247,13 +329,13 @@ document.addEventListener('DOMContentLoaded', async function () {
                 const formData = {
                     name: playlistName.value,
                     profiles: selectedProfiles,
-                    videoIds: selectedVideos, 
+                    videoIds: selectedVideos,
                     parent: parent.id
                 };
 
                 console.log('Data to send:', formData);
 
-                // Validaciones básicas
+                // Validaciones 
                 if (!formData.name?.trim()) {
                     throw new Error('Playlist name is required');
                 }
@@ -264,11 +346,9 @@ document.addEventListener('DOMContentLoaded', async function () {
                     throw new Error('Select at least one video');
                 }
 
-                // Determinar si es creación o actualización
-                const url = playlistId ? `/playlist/${playlistId}` : '/playlist';
-                const method = playlistId ? 'PATCH' : 'POST';
+                const url = `/${playlistId}`
+                const method ='PATCH'
 
-                // Enviar datos al servidor
                 const result = await safeFetch(url, {
                     method: method,
                     body: JSON.stringify(formData)
@@ -276,7 +356,6 @@ document.addEventListener('DOMContentLoaded', async function () {
 
                 console.log('Server response:', result);
 
-                // Redirigir después de guardar
                 window.location.href = playlistId
                     ? `showPlaylist.html?profileId=${profileId || parent.id}`
                     : `showPlaylist.html?profileId=${parent.id}`;
@@ -297,6 +376,5 @@ document.addEventListener('DOMContentLoaded', async function () {
         return /^[0-9a-fA-F]{24}$/.test(id);
     }
 
-    // Iniciar carga de datos
     loadInitialData();
 });
