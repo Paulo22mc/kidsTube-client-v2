@@ -1,17 +1,15 @@
 const API_URL = 'http://localhost:3001/api/playlist';
+const GRAPHQL_API_URL = "http://localhost:4000/graphql";
 
-// Verificar si el usuario esta logueado
+// Verificar si el usuario está logueado
 window.addEventListener("DOMContentLoaded", () => {
     const user = sessionStorage.getItem('user');
     if (!user) {
-        window.location.href = '/index.html'; 
+        window.location.href = '/index.html';
     }
 });
 
-//**
-//obtiene usuario en sesion
-//si existen playlist las muestra
-//  */
+// Al cargar el DOM, obtener usuario en sesión y mostrar playlists
 document.addEventListener("DOMContentLoaded", async function () {
     try {
         const parent = getSessionUser();
@@ -26,7 +24,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 });
 
-// obtiene el usuario en sesion
+// Obtiene el usuario en sesión
 function getSessionUser() {
     try {
         const parentData = sessionStorage.getItem("user");
@@ -41,7 +39,7 @@ function getSessionUser() {
     }
 }
 
-// Solicitud para obtener playlist (con token)
+// Consulta GraphQL para obtener playlists por parentId
 async function fetchPlaylists(parentId) {
     const token = sessionStorage.getItem("token");
     if (!token) {
@@ -50,78 +48,94 @@ async function fetchPlaylists(parentId) {
         return [];
     }
 
-    try {
-        const response = await fetch(`${API_URL}?parentId=${parentId}`, {
-            method: 'GET',
-            headers: {
-                "Authorization": `Bearer ${token}`
+    const query = `
+        query($parentId: ID!) {
+            allPlaylists(parentId: $parentId) {
+                id
+                name
+                videos {
+                    id
+                }
             }
+        }
+    `;
+
+    const variables = { parentId };
+
+    try {
+        const response = await fetch(GRAPHQL_API_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify({ query, variables }),
         });
 
         if (!response.ok) throw new Error("Failed to fetch playlists");
 
-        const result = await response.json();
-        return result.data || [];
+        const { data, errors } = await response.json();
+
+        if (errors) {
+            console.error("GraphQL errors:", errors);
+            return [];
+        }
+
+        return data.allPlaylists || [];
     } catch (error) {
-        console.error("Fetch error:", error);
+        console.error("GraphQL Fetch error:", error);
         throw error;
     }
 }
 
-// crear las cartas en html
+// Renderiza las playlists como tarjetas HTML
 function renderPlaylists(playlists) {
     const playlistsContainer = document.getElementById("playlists");
-    if (!playlistsContainer) {
-        return;
-    }
+    if (!playlistsContainer) return;
 
     playlistsContainer.innerHTML = playlists.map(playlist => `
-    <div class="col mt-3">
-    <div class="card h-100 shadow-sm" style="border-radius: 10px; overflow: hidden; border: 1px solid #f0f0f0;">
-        <!-- Imagen de portada -->
-        <div class="position-relative" style="height: 120px; background-color: #f8f9fa;">
-            <img src="/images/fondo.jpeg" 
-                 alt="Playlist cover"
-                 class="h-100 w-100 object-fit-cover"
-                 style="opacity: 0.9;">
-            <div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
-                <i class="fas fa-headphones text-white" style="font-size: 2rem; text-shadow: 0 2px 4px rgba(0,0,0,0.2);"></i>
-            </div>
-        </div>
+        <div class="col mt-3">
+            <div class="card h-100 shadow-sm" style="border-radius: 10px; overflow: hidden; border: 1px solid #f0f0f0;">
+                <div class="position-relative" style="height: 120px; background-color: #f8f9fa;">
+                    <img src="/images/fondo.jpeg" 
+                        alt="Playlist cover"
+                        class="h-100 w-100 object-fit-cover"
+                        style="opacity: 0.9;">
+                    <div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
+                        <i class="fas fa-headphones text-white" style="font-size: 2rem; text-shadow: 0 2px 4px rgba(0,0,0,0.2);"></i>
+                    </div>
+                </div>
 
-        <div class="card-body p-3">
-            <!-- Título -->
-            <h5 class="card-title mb-2" style="font-size: 1rem; font-weight: 600;">
-                <i class="far fa-list-alt me-2" style="color: #6c757d;"></i>
-                ${playlist.name || 'Unnamed Playlist'}
-            </h5>
-            
-            <!-- Contador de videos -->
-            <p class="card-text mb-3" style="font-size: 0.85rem; color: #6c757d;">
-                <i class="far fa-play-circle me-1"></i>
-                ${playlist.videos?.length || 0} videos
-            </p>
-            
-            <!-- Botones minimalistas -->
-            <div class="d-flex gap-2">
-                <a href="updatePlaylist.html?id=${playlist._id}" 
-                   class="btn btn-sm btn-outline-secondary py-1 px-2"
-                   style="border-radius: 6px; font-size: 0.8rem;">
-                   <i class="far fa-edit me-1"></i> Edit
-                </a>
-                <button class="btn btn-sm btn-outline-danger py-1 px-2" 
-                        style="border-radius: 6px; font-size: 0.8rem;"
-                        onclick="deletePlaylist('${playlist._id}', this)">
-                   <i class="far fa-trash-alt me-1"></i> Delete
-                </button>
+                <div class="card-body p-3">
+                    <h5 class="card-title mb-2" style="font-size: 1rem; font-weight: 600;">
+                        <i class="far fa-list-alt me-2" style="color: #6c757d;"></i>
+                        ${playlist.name || 'Unnamed Playlist'}
+                    </h5>
+
+                    <p class="card-text mb-3" style="font-size: 0.85rem; color: #6c757d;">
+                        <i class="far fa-play-circle me-1"></i>
+                        ${playlist.videos?.length || 0} videos
+                    </p>
+
+                    <div class="d-flex gap-2">
+                        <a href="updatePlaylist.html?id=${playlist.id}" 
+                        class="btn btn-sm btn-outline-secondary py-1 px-2"
+                        style="border-radius: 6px; font-size: 0.8rem;">
+                            <i class="far fa-edit me-1"></i> Edit
+                        </a>
+                        <button class="btn btn-sm btn-outline-danger py-1 px-2" 
+                            style="border-radius: 6px; font-size: 0.8rem;"
+                            onclick="deletePlaylist('${playlist.id}', this)">
+                            <i class="far fa-trash-alt me-1"></i> Delete
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-</div>
     `).join('');
 }
 
-// Eliminar playlist (con token)
+// Eliminar una playlist
 async function deletePlaylist(playlistId, buttonElement) {
     const token = sessionStorage.getItem("token");
     if (!token) {
