@@ -1,9 +1,10 @@
-const API_URL = "http://localhost:3001/api/user";
+const API_URL = "http://localhost:3001/api/restricted";
+const GRAPHQL_API_URL = "http://localhost:4000/graphql";
 
 // Verificar si el usuario esta logueado
 window.addEventListener("DOMContentLoaded", () => {
-    const user = sessionStorage.getItem('user');
-    if (!user) {
+    const token = sessionStorage.getItem('token');
+    if (!token) {
         window.location.href = '/index.html';
     }
 });
@@ -37,18 +38,39 @@ async function getUsers() {
         return [];
     }
 
-    try {
-        const response = await fetch(`${API_URL}/parent/${parentId}`, {
-            method: "GET",
-            headers: {
-                "Authorization": `Bearer ${token}`
+    const query = `
+        query GetRestrictedUsersByParent($parentId: ID!) {
+            getRestrictedUsersByParent(parentId: $parentId) {
+                id
+                fullName
+                avatar
             }
+        }
+    `;
+
+    try {
+        const response = await fetch(GRAPHQL_API_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                query,
+                variables: { parentId }
+            })
         });
 
         if (!response.ok) throw new Error("Error getting users");
 
-        const users = await response.json();
-        return users;
+        const { data, errors } = await response.json();
+
+        if (errors) {
+            console.error("GraphQL errors:", errors);
+            return [];
+        }
+
+        return data.getRestrictedUsersByParent;
     } catch (error) {
         console.error(error);
         return [];
@@ -79,10 +101,10 @@ async function renderUsers() {
                      alt="Avatar" class="rounded-circle mb-3" width="100">
                 <h5 class="card-title fw-bold">${user.fullName}</h5>
                 <div class="mt-3 d-flex justify-content-center gap-2">
-                    <a href="./updateUser.html?id=${user._id}" class="btn btn-outline-light btn-sm d-flex align-items-center gap-1">
+                    <a href="./updateUser.html?id=${user.id}" class="btn btn-outline-light btn-sm d-flex align-items-center gap-1">
                         <i class="bi bi-pencil-square"></i> Edit
                     </a>
-                    <button class="btn btn-outline-danger btn-sm d-flex align-items-center gap-1" onclick="deleteUser('${user._id}')">
+                    <button class="btn btn-outline-danger btn-sm d-flex align-items-center gap-1" onclick="deleteUser('${user.id}')">
                         <i class="bi bi-trash"></i> Delete
                     </button>
                 </div>
@@ -115,7 +137,7 @@ async function deleteUser(userId) {
 
         if (response.ok) {
             console.log("User deleted successfully.");
-            renderUsers(); // Recargar la lista
+            renderUsers();
         } else {
             console.log("Error deleting user.");
         }
@@ -125,5 +147,4 @@ async function deleteUser(userId) {
 }
 
 
-// Ejecutar la carga de usuarios cuando se cargue la página
 document.addEventListener("DOMContentLoaded", renderUsers);

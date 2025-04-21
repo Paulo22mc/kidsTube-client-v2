@@ -73,7 +73,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
         try {
-            const response = await fetch('http://localhost:3001/api/user', {
+            const response = await fetch('http://localhost:3001/api/restricted', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

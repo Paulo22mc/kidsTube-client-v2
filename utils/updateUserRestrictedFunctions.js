@@ -1,10 +1,11 @@
-const API_URL = "http://localhost:3001/api/user";
+const GRAPHQL_API_URL = "http://localhost:4000/graphql";
+const API_URL = "http://localhost:3001/api/restricted";
 let user;
 
 // Verificar si el usuario esta logueado
 window.addEventListener("DOMContentLoaded", () => {
-    const user = sessionStorage.getItem('user');
-    if (!user) {
+    const token = sessionStorage.getItem('token');
+    if (!token) {
         window.location.href = '/index.html';
     }
 });
@@ -24,52 +25,53 @@ async function getUserById(userId) {
         return null;
     }
 
-    try {
-        const response = await fetch(`${API_URL}/${userId}`, {
-            method: "GET",
-            headers: {
-                "Authorization": `Bearer ${token}`
+    const query = `
+        query GetUserRestrictedById($id: ID!) {
+            getUserRestrictedById(id: $id) {
+                id
+                fullName
+                avatar
             }
+        }
+    `;
+
+    try {
+        const response = await fetch(GRAPHQL_API_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                query,
+                variables: { id: userId }
+            })
         });
 
-        if (!response.ok) throw new Error("Error al obtener el usuario");
+        if (!response.ok) throw new Error("Error getting user by ID");
 
-        const userData = await response.json();
-        return userData;
+        const {data, errors} = await response.json();
+
+        if (errors) {
+            console.error("GraphQL errors:", errors);
+            throw new Error("Error fetching user data");
+        }
+
+        return data.getUserRestrictedById || null;
+
     } catch (error) {
         console.error(error);
         return null;
     }
 }
-// Función para llenar el formulario con los datos del usuario
-/*async function fillForm() {
-    const userId = getUserIdFromUrl();
-    if (!userId) {
-        console.error("User ID not found");
-        return;
-    }
 
-    user = await getUserById(userId);
-    if (!user) {
-        console.error("Could not get user");
-        return;
-    }
-
-    // Llenar el formulario con los datos del usuario
-    document.getElementById("fullName").value = user.fullName;
-    document.getElementById("pin").value = user.pin;
-
-    loadAvatars(user.avatar);
-}*/
-
-// Función para cargar todos los avatares disponibles
+// cargar todos los avatares disponibles
 function loadAvatars(selectedAvatar) {
     const avatars = ["personaje1.jpg", "personaje2.jpg", "personaje3.jpg", "personaje4.jpg", "personaje5.jpg", "personaje6.jpg", "personaje7.jpg", "personaje8.jpg", "personaje9.jpg", "personaje10.jpg", "personaje11.jpg"];
     const avatarSelectionContainer = document.getElementById("avatarSelection");
 
     avatarSelectionContainer.innerHTML = '';
 
-    // Crear las imágenes de los avatares
     avatars.forEach(avatar => {
         const img = document.createElement("img");
         img.src = `../../images/avatars/${avatar}`;
@@ -77,7 +79,6 @@ function loadAvatars(selectedAvatar) {
         img.classList.add("avatar-img");
         img.dataset.avatarName = avatar;
 
-        // Marcar el avatar actual como seleccionado
         if (avatar === selectedAvatar) {
             img.classList.add("selected");
         }
@@ -123,7 +124,6 @@ async function fillForm() {
     loadAvatars(user.avatar);
 }
 
-// Función para actualizar el usuario (modificada para manejar PIN opcional)
 // Función para actualizar el usuario
 async function updateUser(event) {
     event.preventDefault();
