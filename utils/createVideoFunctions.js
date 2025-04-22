@@ -74,3 +74,48 @@ async function createVideo() {
         alert("There was an error saving the video.");
     }
 }
+
+document.getElementById("searchBtn").addEventListener("click", async () => {
+    const query = document.getElementById("searchQuery").value.trim();
+
+    if (!query) {
+        alert("Please enter a word or phrase to search.");
+        return;
+    }
+
+    try {
+        const res = await fetch(`http://localhost:3001/api/video/search?q=${encodeURIComponent(query)}`);
+        if (!res.ok) throw new Error("Could not get results from YouTube");
+
+        const data = await res.json();
+
+        const container = document.getElementById("resultsContainer");
+        container.innerHTML = ""; // Limpiar resultados anteriores
+
+        if (!data.videos.length) {
+            container.innerHTML = `<p class="text-muted">No videos found.</p>`;
+            return;
+        }
+
+        data.videos.forEach(video => {
+            const col = document.createElement("div");
+            col.className = "col-md-4";
+
+            col.innerHTML = `
+                <div class="card h-100 shadow-sm">
+                    <img src="${video.thumbnail}" class="card-img-top" alt="${video.title}">
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">${video.title}</h5>
+                        <p class="card-text">${video.description}</p>
+                        <a href="${video.url}" target="_blank" class="btn btn-primary mt-auto">Go to YouTube</a>
+                    </div>
+                </div>
+            `;
+            container.appendChild(col);
+        });
+
+    } catch (error) {
+        console.error("Error searching for videos:", error);
+        alert("Error searching for videos:");
+    }
+});
