@@ -62,3 +62,43 @@ h2 {
     font-size: 1rem;
     color: #555;
 }
+
+.video-card {
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    background-color: white;
+    transition: transform 0.3s ease;
+}
+
+.video-card:hover {
+    transform: scale(1.02);
+}
+
+.video-card img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+}
+
+.video-card-body {
+    padding: 15px;
+}
+
+.video-title {
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #1b4965;
+}
+
+.video-url {
+    font-size: 0.9rem;
+    word-break: break-all;
+    color: #3a7ca5;
+}
+
+.video-description {
+    font-size: 0.9rem;
+    color: #555;
+}
