@@ -1,18 +1,25 @@
-document.getElementById("createButton").addEventListener("click", createVideo);
-
-// Verificar si el usuario esta logueado
+// Verificar si el usuario está logueado al cargar la página
 window.addEventListener("DOMContentLoaded", () => {
     const user = sessionStorage.getItem('user');
     if (!user) {
         window.location.href = '/index.html'; 
     }
+
+    // Asignar eventos solo si el usuario está logueado
+    document.getElementById("createButton").addEventListener("click", createVideo);
+    document.getElementById("searchBtn").addEventListener("click", searchVideos);
 });
 
 // Función para crear un nuevo video
 async function createVideo() {
-    const videoName = document.getElementById("name").value;
-    const videoURL = document.getElementById("url").value;
-    const videoDescription = document.getElementById("description").value;
+    const videoName = document.getElementById("name").value.trim();
+    const videoURL = document.getElementById("url").value.trim();
+    const videoDescription = document.getElementById("description").value.trim();
+
+    if (!videoName || !videoURL || !videoDescription) {
+        alert("All fields are required.");
+        return;
+    }
 
     const parentData = sessionStorage.getItem("user");
     if (!parentData) {
@@ -22,10 +29,10 @@ async function createVideo() {
 
     const parent = JSON.parse(parentData);
 
-    // Validación de la URL (para que sea una URL válida)
+    // Validación de la URL
     const urlRegex = /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/i;
     if (!urlRegex.test(videoURL)) {
-        alert("The URL provided is not a valid link.");
+        alert("The URL provided is not valid.");
         return;
     }
 
@@ -36,35 +43,28 @@ async function createVideo() {
         parent: parent.id
     };
 
-    // Obtener el token JWT del sessionStorage
-    const token = sessionStorage.getItem("token");
-    if (!token) {
-        alert("Authentication token not found. Please log in again.");
-        window.location.href = '/index.html';
-        return;
-    }
-
     try {
+        const token = sessionStorage.getItem("token");
+
         const response = await fetch("http://localhost:3001/api/video", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}` 
+                "Authorization": `Bearer ${token}`
             },
             body: JSON.stringify(videoData),
         });
-
-        if (!response.ok) throw new Error("Error al crear el video");
+        
+        if (!response.ok) throw new Error("Error creating the video");
 
         const data = await response.json();
         console.log("Successfully created video:", data);
 
-        // Limpiar el formulario después de crear el video
         document.getElementById("name").value = '';
         document.getElementById("url").value = '';
         document.getElementById("description").value = '';
 
-        alert("Successfully created video:");
+        alert("Video created successfully!");
         window.location.href = "./videoList.html";
 
     } catch (error) {
@@ -73,8 +73,8 @@ async function createVideo() {
     }
 }
 
-// Función de búsqueda y mostrar resultados
-document.getElementById("searchBtn").addEventListener("click", async () => {
+// Función de búsqueda de videos
+async function searchVideos() {
     const query = document.getElementById("searchQuery").value.trim();
 
     if (!query) {
@@ -84,12 +84,11 @@ document.getElementById("searchBtn").addEventListener("click", async () => {
 
     try {
         const res = await fetch(`http://localhost:3001/api/video/search?q=${encodeURIComponent(query)}`);
-        if (!res.ok) throw new Error("Could not get results from YouTube");
+        if (!res.ok) throw new Error("Could not fetch results");
 
         const data = await res.json();
-
         const container = document.getElementById("resultsContainer");
-        container.innerHTML = ""; // Limpiar resultados anteriores
+        container.innerHTML = "";
 
         if (!data.videos.length) {
             container.innerHTML = `<p class="text-muted">No videos found.</p>`;
@@ -100,7 +99,6 @@ document.getElementById("searchBtn").addEventListener("click", async () => {
             const col = document.createElement("div");
             col.className = "col-md-4";
 
-            // Evitar problemas al pasar el objeto con comillas usando atributos
             const videoDataStr = encodeURIComponent(JSON.stringify(video));
 
             col.innerHTML = `
@@ -109,7 +107,6 @@ document.getElementById("searchBtn").addEventListener("click", async () => {
                     <div class="card-body d-flex flex-column">
                         <h5 class="card-title">${video.title}</h5>
                         <p class="card-text">${video.description}</p>
-                        <a href="${video.url}" target="_blank" class="btn btn-primary mb-2">Go to YouTube</a>
                         <button class="btn btn-primary mb-2" onclick='useVideo("${videoDataStr}")'>Select</button>
                     </div>
                 </div>
@@ -118,12 +115,12 @@ document.getElementById("searchBtn").addEventListener("click", async () => {
         });
 
     } catch (error) {
-        console.error("Error searching for videos:", error);
-        alert("Error searching for videos:");
+        console.error("Search error:", error);
+        alert("There was an error searching for videos.");
     }
-});
+}
 
-// Función para llenar el formulario con los datos del video seleccionado
+// Llenar el formulario con los datos del video seleccionado
 function useVideo(videoStr) {
     const video = JSON.parse(decodeURIComponent(videoStr));
 
