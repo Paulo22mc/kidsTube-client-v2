@@ -1,4 +1,5 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+//import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+/** 
 import {
     getAuth,
     GoogleAuthProvider,
@@ -18,7 +19,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 auth.languageCode = 'en';
-const provider = new GoogleAuthProvider();
+const provider = new GoogleAuthProvider();*/
 
 const loginUser = async (email, password) => {
     try {
@@ -50,25 +51,17 @@ const loginUser = async (email, password) => {
 
 const validateCode = async (userId, enteredPin) => {
     try {
-        if (!enteredPin || enteredPin.length < 6) {
-            throw new Error('El código debe tener 6 dígitos');
-        }
-
         const response = await fetch('http://localhost:3001/api/login/validate-sms', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-                userId,
-                enteredPin,
-                securityCode: enteredPin
-            }),
+            body: JSON.stringify({ userId, code: enteredPin }),
         });
 
         if (!response.ok) {
             const data = await response.json();
-            throw new Error(data.error || 'Código incorrecto');
+            throw new Error(data.error || 'Error validating SMS code');
         }
 
         const data = await response.json();
@@ -78,13 +71,8 @@ const validateCode = async (userId, enteredPin) => {
 
         window.location.href = "./html/dashboard/dashboard.html";
 
-    }
-    catch (error) {
-        console.error('Respuesta completa del error:', {
-            status: response.status,
-            statusText: response.statusText,
-            errorData: await response.json().catch(() => null)
-        });
+    } catch (error) {
+        console.error('Error validating SMS code:', error);
         showError(error.message);
     }
 };
@@ -107,11 +95,14 @@ const showVerificationForm = (userId) => {
     const verificationForm = document.getElementById('verificationForm');
     verificationForm.style.display = 'block';
   
-    document.getElementById('verifyButton').onclick = () => {
-      const enteredPin = document.getElementById('pinInput').value;
-      validateCode(userId, enteredPin);
+    document.getElementById('verifyButton').onclick = async () => {
+        const verifyButton = document.getElementById('verifyButton');
+        verifyButton.disabled = true; // Deshabilitar el botón
+        const enteredPin = document.getElementById('pinInput').value;
+        await validateCode(userId, enteredPin);
+        verifyButton.disabled = false; // Habilitar el botón nuevamente
     };
-  };
+};
 
 window.handleLogin = function () {
     const email = document.getElementById('emailInput').value;
@@ -160,4 +151,4 @@ const handleGoogleLogin = async () => {
 };
 
 // Asignar el evento al botón de Google
-document.getElementById('google-login-btn').addEventListener('click', handleGoogleLogin);
+//document.getElementById('google-login-btn').addEventListener('click', handleGoogleLogin);
