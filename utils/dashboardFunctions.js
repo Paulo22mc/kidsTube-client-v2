@@ -133,7 +133,7 @@ document.getElementById("confirmPinParent").addEventListener("click", function (
 // Validar PIN del padre
 async function validatePin(userId, enteredPin) {
     try {
-        const response = await fetch(`http://localhost:3001/api/register/validate`, {
+        const response = await fetch(`http://localhost:3001/api/auth/validate`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

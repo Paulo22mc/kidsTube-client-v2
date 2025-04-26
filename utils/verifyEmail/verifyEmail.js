@@ -12,7 +12,7 @@ async function verifyEmail() {
   }
 
   try {
-    const response = await fetch(`http://localhost:3001/api/register/verify/${token}`, {
+    const response = await fetch(`http://localhost:3001/api/auth/verify/${token}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
