@@ -26,7 +26,9 @@ body {
     font-family: 'BSriracha', sans-serif;
 }
 
-h4, .form-label, p {
+h4,
+.form-label,
+p {
     font-family: 'Sriracha', sans-serif;
     font-size: large
 }
@@ -43,42 +45,72 @@ h4, .form-label, p {
 .btn-outline-danger {
     font-size: 10px;
     font-weight: bold;
-    border-radius: 25px; 
-    padding: 8px 15px; 
+    border-radius: 25px;
+    padding: 8px 15px;
     transition: background-color 0.3s ease, color 0.3s ease;
-    border: 2px solid #e74c3c; 
+    border: 2px solid #e74c3c;
     color: #e74c3c;
-    display: inline-block; 
-    margin-top: 10px; 
+    display: inline-block;
+    margin-top: 10px;
 }
 
 .btn-outline-danger:hover {
-    background-color: #e74c3c; 
+    background-color: #e74c3c;
     color: white;
-    border: 2px solid #c0392b; 
+    border: 2px solid #c0392b;
 }
 
-.google-button {
-    display: inline-flex;
+.google-btn {
+    display: flex;
     align-items: center;
     justify-content: center;
-    padding: 10px 20px;
+    background-color: #4285F4;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin: 10px 0;
+    width: 100%;
+}
+
+.google-btn:hover {
+    background-color: #357ABD;
+}
+
+.google-icon {
+    margin-right: 10px;
+    background-color: white;
+    padding: 2px;
+    border-radius: 2px;
+}
+
+#profileCompletionForm {
+    display: none;
+}
+
+#profileCompletionForm {
+    max-width: 500px;
+    margin: 20px auto;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background: #f9f9f9;
+}
+
+#profileCompletionForm .form-group {
+    margin-bottom: 15px;
+}
+
+#profileCompletionForm label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+#profileCompletionForm input {
+    width: 100%;
+    padding: 8px;
     border: 1px solid #ddd;
     border-radius: 4px;
-    background: white;
-    color: #757575;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background-color 0.3s;
-    margin-top: 15px;
-    width: 100%;
-  }
-  
-  .google-button:hover {
-    background: #f5f5f5;
-  }
-  
-  .google-button i {
-    margin-right: 8px;
-    color: #DB4437;
-  }
+}
