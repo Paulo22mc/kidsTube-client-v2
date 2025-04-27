@@ -186,7 +186,7 @@ async function completeProfile() {
         const data = await response.json();
         sessionStorage.setItem('token', data.token);
         sessionStorage.setItem('user', JSON.stringify(data.user));
-        window.location.href = "./html/dashboard/dashboard.html";
+        window.location.href = "../index.html";
         
     } catch (error) {
         showProfileError(error.message);
