@@ -1,139 +1,131 @@
-/* Estilos Generales */
-/* Estilos Generales */
+:root {
+    --primary-dark: #0a2463;
+    --primary-medium: #1e3d8b;
+    --primary-light: #3e5fbc;
+    --accent-blue: #5e9eff;
+    --light-color: #f8f9fa;
+    --dark-color: #212529;
+}
+
 body {
     font-family: 'Baskervville', serif;
-    background-color: #f5f5f5;
+    background: linear-gradient(135deg, var(--primary-dark), var(--primary-medium));
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding: 20px;
     margin: 0;
-    padding: 0;
+}
+
+.registration-container {
+    max-width: 700px;
+    width: 100%;
+    margin: 0 auto;
 }
 
 .card-registration {
-    background: linear-gradient(to right, #003366, #00509e);
-    color: white;
-    border-radius: 0.5rem;
-    max-width: 800px; /* Aumentar el ancho para acomodar dos columnas */
-    margin: 50px auto;
-    padding: 30px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
 }
 
-.card-registration h1 {
-    font-size: 2rem;
-    color: white;
+.card-body {
+    padding: 2rem !important;
+    background: white;
+}
+
+.form-group {
+    position: relative;
+    margin-bottom: 1.25rem;
+}
+
+.form-control, .form-select {
+    border-radius: 8px;
+    padding: 10px 15px 10px 40px;
+    font-size: 0.95rem;
+    border: 1px solid #d1d7e0;
+    height: calc(2.25rem + 10px);
+    width: 100%;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 0.2rem rgba(94, 158, 255, 0.25);
+}
+
+.form-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--primary-dark);
+    margin-bottom: 0.4rem;
+    display: block;
+}
+
+.form-icon {
+    position: absolute;
+    left: 12px;
+    top: 38px;
+    color: var(--primary-dark);
+    font-size: 1rem;
+}
+
+h1 {
+    font-size: 1.6rem;
+    color: var(--primary-dark);
+    margin-bottom: 1.8rem !important;
     text-align: center;
-    margin-bottom: 30px;
     font-weight: 700;
 }
 
-/* Contenedor del formulario en dos columnas */
-.card-registration .form-container {
-    display: grid;
-    grid-template-columns: 1fr 1fr; /* Dos columnas iguales */
-    gap: 20px; /* Espacio entre columnas */
-    width: 100%;
-}
-
-.card-registration .form-container .form-group {
-    display: flex;
-    flex-direction: column;
-}
-
-.card-registration .form-label {
-    font-size: 1.1rem;
-    font-weight: bold;
-    margin-bottom: 10px;
-    color: #f0f0f0;
-}
-
-.card-registration .form-control {
-    width: 100%;
-    background-color: rgba(255, 255, 255, 0.2);
+.btn-register {
+    background: var(--primary-dark);
     color: white;
-    border: 1px solid #004c8c;
-    border-radius: 0.3rem;
-    padding: 12px;
-    font-size: 1rem;
-    box-sizing: border-box;
-}
-
-.card-registration .form-control:focus {
-    border-color: #1e90ff;
-    box-shadow: 0 0 5px rgba(30, 144, 255, 0.8);
-}
-
-.card-registration .form-control::placeholder {
-    color: rgba(255, 255, 255, 0.7);
-}
-
-/* Botones */
-.card-registration .btn-container {
-    grid-column: span 2; /* Los botones ocupan ambas columnas */
-    display: flex;
-    justify-content: space-between;
-    gap: 20px;
-    margin-top: 20px;
-}
-
-.card-registration .btn {
-    font-size: 1.1rem;
-    padding: 12px 20px;
-    border-radius: 0.5rem;
-    font-weight: 600;
-    width: 48%; /* Cada botón ocupa el 48% del ancho */
-    box-sizing: border-box;
-}
-
-.card-registration .btn-light {
-    background-color: #f0f0f0;
-    color: #003366;
+    font-size: 0.95rem;
+    padding: 8px 20px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
     border: none;
 }
 
-.card-registration .btn-light:hover {
-    background-color: #e0e0e0;
+.btn-register:hover {
+    background: var(--primary-medium);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(10, 36, 99, 0.2);
 }
 
-.card-registration .btn-warning {
-    background-color: #007bff;
-    color: white;
-    border: none;
+.btn-back {
+    border: 1px solid var(--primary-dark);
+    color: var(--primary-dark);
+    font-size: 0.95rem;
+    padding: 8px 20px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    background: white;
 }
 
-.card-registration .btn-warning:hover {
-    background-color: #0056b3;
+.btn-back:hover {
+    background: #f1f1f1;
 }
 
-/* Ajustes para pantallas pequeñas */
-@media (max-width: 768px) {
-    .card-registration {
-        padding: 20px;
-        max-width: 90%;
+#messageContainer {
+    font-size: 0.9rem;
+    padding: 10px 15px;
+    margin-bottom: 1.5rem;
+    border-radius: 6px;
+    display: none;
+}
+
+@media (max-width: 767.98px) {
+    body {
+        padding: 15px;
     }
-
-    .card-registration .form-container {
-        grid-template-columns: 1fr; /* Cambiar a una columna en pantallas pequeñas */
+    
+    .card-body {
+        padding: 1.5rem !important;
     }
-
-    .card-registration .btn-container {
-        flex-direction: column;
-        gap: 10px;
+    
+    .form-icon {
+        top: 36px;
     }
-
-    .card-registration .btn {
-        width: 100%; /* Los botones ocupan todo el ancho */
-    }
-}
-
-
-#country {
-    color: #fff !important; /* Asegurar texto claro */
-    border-color: #444 !important; /* Ajustar el borde */
-}
-
-/* Ajustar el fondo de las opciones dentro del select */
-#country option {
-    background-color: #333;
-    color: #fff;
 }
