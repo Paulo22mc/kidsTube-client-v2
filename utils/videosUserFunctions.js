@@ -77,24 +77,11 @@ async function loadPlaylistVideos() {
           return null;
         }
 
-
-        const youtubeResponse = await fetch(`http://localhost:3001/api/video/search?q=${encodeURIComponent(video.name)}`);
-
-        if (!youtubeResponse.ok) {
-          console.warn(`Failed to fetch YouTube details for: ${video.name}`);
-          return createBasicVideoCard(video, youtubeId);
-        }
-
-        const youtubeData = await youtubeResponse.json();
-        const youtubeVideo = youtubeData.videos?.find(v => v.videoId === youtubeId);
-
-        return createEnhancedVideoCard(video, youtubeId, youtubeVideo);
-
       } catch (error) {
         console.error(`Error processing video ${video.name}:`, error);
         return createBasicVideoCard(video, extractYouTubeId(video.url));
       }
-    }));
+    })); 
 
 
     videoCards.filter(card => card !== null).forEach(card => {
