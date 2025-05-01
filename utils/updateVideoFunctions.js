@@ -2,15 +2,17 @@
 window.addEventListener("DOMContentLoaded", () => {
     const user = sessionStorage.getItem('user');
     if (!user) {
-        window.location.href = '/index.html'; 
+        window.location.href = '/index.html';
     }
+
+    document.getElementById("searchBtn").addEventListener("click", searchVideos);
 });
 
 // obtiene info del DOM y carga los metodos
-document.addEventListener('DOMContentLoaded', async function() {
+document.addEventListener('DOMContentLoaded', async function () {
     const urlParams = new URLSearchParams(window.location.search);
     const videoId = urlParams.get('id');
-    
+
     if (!videoId) {
         console.log('Error: No video specified to edit');
         window.location.href = '../video/videoList.html';
@@ -22,10 +24,10 @@ document.addEventListener('DOMContentLoaded', async function() {
         if (!sessionData) {
             throw new Error('There is no active session');
         }
-        
+
         const user = JSON.parse(sessionData);
         const video = await loadVideoData(videoId, user.id);
-        
+
         document.getElementById('name').value = video.name || '';
         document.getElementById('url').value = video.url || '';
         document.getElementById('description').value = video.description || '';
@@ -114,7 +116,7 @@ async function updateVideo(videoId) {
             throw new Error(errorData.error || 'Error updating video');
         }
         window.location.href = '../video/videoList.html';
-        
+
     } catch (error) {
         console.log(`Error: ${error.message}`);
         const updateButton = document.getElementById('updateButton');
@@ -128,4 +130,74 @@ async function updateVideo(videoId) {
 function isValidYouTubeUrl(url) {
     const pattern = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/.+/;
     return pattern.test(url);
+}
+
+// Función de búsqueda de videos
+async function searchVideos() {
+    const query = document.getElementById("searchQuery").value.trim();
+
+    if (!query) {
+        alert("Please enter a word or phrase to search.");
+        return;
+    }
+
+    try {
+        const token = sessionStorage.getItem('token');
+
+        if (!token) {
+            console.error('No token found in sessionStorage');
+            alert('You must be logged in to search for videos.');
+            return;
+        }
+
+        const res = await fetch(`http://localhost:3001/api/video/search?q=${encodeURIComponent(query)}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            }
+        });
+
+        if (!res.ok) throw new Error("Could not fetch results");
+
+        const data = await res.json();
+        const container = document.getElementById("resultsContainer");
+        container.innerHTML = "";
+
+        if (!data.videos.length) {
+            container.innerHTML = `<p class="text-muted">No videos found.</p>`;
+            return;
+        }
+
+        data.videos.forEach(video => {
+            const col = document.createElement("div");
+            col.className = "col-md-4";
+
+            const videoDataStr = encodeURIComponent(JSON.stringify(video));
+
+            col.innerHTML = `
+                <div class="card h-100 shadow-sm">
+                    <img src="${video.thumbnail}" class="card-img-top" alt="${video.title}">
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">${video.title}</h5>
+                        <p class="card-text">${video.description}</p>
+                        <button class="btn btn-primary mb-2" onclick='useVideo("${videoDataStr}")'>Select</button>
+                    </div>
+                </div>
+            `;
+            container.appendChild(col);
+        });
+
+    } catch (error) {
+        console.error("Search error:", error);
+        alert("There was an error searching for videos.");
+    }
+}
+
+// Llenar el formulario con los datos del video seleccionado
+function useVideo(videoStr) {
+    const video = JSON.parse(decodeURIComponent(videoStr));
+
+    document.getElementById("name").value = video.title || "";
+    document.getElementById("url").value = video.url || "";
+    document.getElementById("description").value = video.description || "";
 }
