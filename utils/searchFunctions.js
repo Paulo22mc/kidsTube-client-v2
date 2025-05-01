@@ -33,6 +33,11 @@ document.addEventListener('DOMContentLoaded', function () {
     try {
       showLoading();
 
+      const token = sessionStorage.getItem('token');
+      if (!token) {
+        throw new Error('Authentication token not found');
+      }
+
       const query = `
         query {
           searchVideosInPlaylist(playlistId: "${playlistId}", query: "${searchTerm}") {
@@ -49,6 +54,7 @@ document.addEventListener('DOMContentLoaded', function () {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({ query })
       });
