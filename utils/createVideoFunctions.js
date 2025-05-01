@@ -2,7 +2,7 @@
 window.addEventListener("DOMContentLoaded", () => {
     const user = sessionStorage.getItem('user');
     if (!user) {
-        window.location.href = '/index.html'; 
+        window.location.href = '/index.html';
     }
 
     // Asignar eventos solo si el usuario está logueado
@@ -54,7 +54,7 @@ async function createVideo() {
             },
             body: JSON.stringify(videoData),
         });
-        
+
         if (!response.ok) throw new Error("Error creating the video");
 
         const data = await response.json();
@@ -83,7 +83,21 @@ async function searchVideos() {
     }
 
     try {
-        const res = await fetch(`http://localhost:3001/api/video/search?q=${encodeURIComponent(query)}`);
+        const token = sessionStorage.getItem('token');
+
+        if (!token) {
+            console.error('No token found in sessionStorage');
+            alert('You must be logged in to search for videos.');
+            return;
+        }
+
+        const res = await fetch(`http://localhost:3001/api/video/search?q=${encodeURIComponent(query)}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`, 
+            }
+        });        
+        
         if (!res.ok) throw new Error("Could not fetch results");
 
         const data = await res.json();

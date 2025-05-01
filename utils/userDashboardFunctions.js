@@ -1,5 +1,11 @@
 const getUserPlaylists = async (profileId) => {
     try {
+        const token = sessionStorage.getItem('token');
+
+        if (!token) {
+            console.error('No token found in sessionStorage');
+        }
+
         profileId = profileId.trim();
         console.log('Attempting to get playlists for profileId:', profileId);
 
@@ -7,6 +13,7 @@ const getUserPlaylists = async (profileId) => {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify({
                 query: `

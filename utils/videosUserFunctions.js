@@ -10,11 +10,20 @@ async function loadPlaylistVideos() {
   }
 
   try {
-    // 1. First get playlist data with video metadata from GraphQL
+        const token = sessionStorage.getItem('token');
+
+        if (!token) {
+          console.error('No token found in sessionStorage');
+          document.getElementById('videosContainer').innerHTML =
+            '<p class="text-center text-danger">You must be logged in to view this content.</p>';
+          return;
+        }
+
     const playlistResponse = await fetch('http://localhost:4000/graphql', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}` 
       },
       body: JSON.stringify({
         query: `
@@ -58,18 +67,18 @@ async function loadPlaylistVideos() {
       return;
     }
 
-    // Process each video in parallel
+
     const videoCards = await Promise.all(videos.map(async (video) => {
       try {
-        // Extract YouTube ID from URL
+
         const youtubeId = extractYouTubeId(video.url);
         if (!youtubeId) {
           console.warn(`Invalid YouTube URL for video: ${video.name}`);
           return null;
         }
 
-        // Get additional video details from YouTube API via your controller
-        const youtubeResponse = await fetch(`http://localhost:3001/api/videos/search?q=${encodeURIComponent(video.name)}`);
+
+        const youtubeResponse = await fetch(`http://localhost:3001/api/video/search?q=${encodeURIComponent(video.name)}`);
 
         if (!youtubeResponse.ok) {
           console.warn(`Failed to fetch YouTube details for: ${video.name}`);
@@ -87,7 +96,7 @@ async function loadPlaylistVideos() {
       }
     }));
 
-    // Add all valid cards to the container
+
     videoCards.filter(card => card !== null).forEach(card => {
       videosContainer.insertAdjacentHTML('beforeend', card);
     });
@@ -99,7 +108,6 @@ async function loadPlaylistVideos() {
   }
 }
 
-// Create basic video card (when YouTube API fails)
 function createBasicVideoCard(video, youtubeId) {
   return `
     <div class="col-md-4 mb-4">
@@ -119,7 +127,7 @@ function createBasicVideoCard(video, youtubeId) {
   `;
 }
 
-// Create enhanced video card with YouTube data
+
 function createEnhancedVideoCard(video, youtubeId, youtubeData) {
   const thumbnail = youtubeData?.thumbnail || 'https://i.ytimg.com/vi/default.jpg';
   const description = youtubeData?.description || video.description || 'No description available';
@@ -143,7 +151,7 @@ function createEnhancedVideoCard(video, youtubeId, youtubeData) {
   `;
 }
 
-// Function to play video in modal
+
 function playVideo(youtubeId) {
   const modal = document.createElement('div');
   modal.className = 'modal fade';
@@ -168,20 +176,20 @@ function playVideo(youtubeId) {
   const modalInstance = new bootstrap.Modal(modal);
   modalInstance.show();
 
-  // Clean up when modal is closed
+
   modal.addEventListener('hidden.bs.modal', () => {
     modal.remove();
   });
 }
 
-// YouTube ID extraction function
+
 function extractYouTubeId(url) {
   const regex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
   const match = url.match(regex);
   return match ? match[1] : null;
 }
 
-// Initialize when page loads
+
 document.addEventListener('DOMContentLoaded', () => {
   const user = sessionStorage.getItem('user');
   if (!user) {
