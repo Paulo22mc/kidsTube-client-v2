@@ -1,40 +1,35 @@
-// =============================================
-// FUNCIONES PRINCIPALES
-// =============================================
 
-/**
- * Maneja el login tradicional (email/password)
- */
+// ---------------- Traditionallogin  (email/password) ------------------- 
+ 
 const loginUser = async (email, password) => {
     try {
         // Validación básica
         if (!email || !password) {
-            throw new Error('Por favor ingresa email y contraseña');
+            throw new Error('Please enter your email and password.');
         }
 
-        // Mostrar estado de carga
+        // Shows charging status 
         const loginBtn = document.querySelector('#loginForm button');
         loginBtn.disabled = true;
         loginBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Verificando...';
 
-        // Llamada al API
+        //Call API for login
         const response = await fetch('http://localhost:3001/api/auth/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password })
         });
 
-        // Restaurar botón
+        // restore buttom 
         loginBtn.disabled = false;
         loginBtn.textContent = 'Log in';
 
-        // Manejar errores
         if (!response.ok) {
             const data = await response.json();
             throw new Error(data.error || 'Error en el login');
         }
 
-        // Mostrar formulario de verificación
+        //Show verification form
         const data = await response.json();
         showVerificationForm(data.userId);
 
@@ -44,14 +39,15 @@ const loginUser = async (email, password) => {
 };
 
 /**
- * Valida el código SMS recibido
+ * Valdate SMS code
  */
 const validateCode = async (userId, enteredPin) => {
     try {
         const verifyBtn = document.getElementById('verifyButton');
         verifyBtn.disabled = true;
-        verifyBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Verificando...';
+        verifyBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Verifying...';
 
+        //Call API for validate SMS code
         const response = await fetch('http://localhost:3001/api/auth/validate-sms', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -63,10 +59,10 @@ const validateCode = async (userId, enteredPin) => {
 
         if (!response.ok) {
             const data = await response.json();
-            throw new Error(data.error || 'Error validando código SMS');
+            throw new Error(data.error || 'Error validating SMS code');
         }
 
-        // Guardar datos y redirigir
+        // Save user data and token 
         const data = await response.json();
         sessionStorage.setItem('user', JSON.stringify(data.user));
         sessionStorage.setItem('token', data.token);
@@ -78,7 +74,7 @@ const validateCode = async (userId, enteredPin) => {
 };
 
 /**
- * Maneja el login y register con Google
+ * Login and register with Google
  */
 async function handleGoogleSignIn(response) {
     try {
@@ -86,14 +82,14 @@ async function handleGoogleSignIn(response) {
         googleBtn.style.opacity = '0.5';
         googleBtn.disabled = true;
 
-        // Primero intenta hacer login
+        // Call API for Google login
         const loginRes = await fetch('http://localhost:3001/api/auth/google/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ tokenId: response.credential })
         });
         
-        // Si el login falla porque el usuario no existe (404), hacer registro
+        // If user not found, register
         if (loginRes.status === 404) {
             const registerRes = await fetch('http://localhost:3001/api/auth/google/register', {
                 method: 'POST',
@@ -103,23 +99,23 @@ async function handleGoogleSignIn(response) {
             
             if (!registerRes.ok) {
                 const errorData = await registerRes.json();
-                throw new Error(errorData.error || 'Error en registro con Google');
+                throw new Error(errorData.error || 'Error google register');
             }
             
             const registerData = await registerRes.json();
+            //Save temporary data
             showProfileCompletionForm(registerData.userId, registerData.tempToken);
             return;
         }
         
-        // Si hubo otro error en el login
         if (!loginRes.ok) {
             const errorData = await loginRes.json();
-            throw new Error(errorData.error || 'Error en login con Google');
+            throw new Error(errorData.error || 'Error google login');
         }
         
-        // Procesar respuesta exitosa de login
         const loginData = await loginRes.json();
         
+        //successful login
         if (loginData.requiresProfileCompletion) {
             showProfileCompletionForm(loginData.userId, loginData.tempToken);
         } else {
@@ -138,7 +134,7 @@ async function handleGoogleSignIn(response) {
 }
 
 /**
- * Completa el perfil para usuarios de Google
+ * Complete user profile after Google login
  */
 async function completeProfile() {
     const phone = document.getElementById('profilePhone').value;
@@ -159,6 +155,7 @@ async function completeProfile() {
         completeBtn.disabled = true;
         completeBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Procesando...';
 
+        // Call API to complete profile
         const response = await fetch('http://localhost:3001/api/auth/google/complete-profile', {
             method: 'POST',
             headers: {
@@ -175,14 +172,14 @@ async function completeProfile() {
         });
 
         completeBtn.disabled = false;
-        completeBtn.textContent = 'Completar Registro';
+        completeBtn.textContent = 'Complete Registration';
 
         if (!response.ok) {
             const errorData = await response.json();
-            throw new Error(errorData.error || 'Error completando registro');
+            throw new Error(errorData.error || 'Error completing registration');
         }
 
-        // Redirigir al dashboard
+        // Redirect to dashboard
         const data = await response.json();
         sessionStorage.setItem('token', data.token);
         sessionStorage.setItem('user', JSON.stringify(data.user));
@@ -193,24 +190,21 @@ async function completeProfile() {
     }
 }
 
-// =============================================
-// FUNCIONES DE APOYO
-// =============================================
 
 /**
- * Muestra el formulario de verificación SMS
+ * Show the verification form after login
  */
 function showVerificationForm(userId) {
-    // Ocultar elementos
+    // Hide elements
     document.getElementById('loginForm').style.display = 'none';
     document.getElementById('google-login-btn').style.display = 'none';
     document.getElementById('link-register').style.display = 'none';
     
-    // Mostrar formulario
+    // Show verification form
     const verificationForm = document.getElementById('verificationForm');
     verificationForm.style.display = 'block';
   
-    // Configurar botón
+    // Configurate button
     document.getElementById('verifyButton').onclick = async () => {
         const enteredPin = document.getElementById('pinInput').value;
         await validateCode(userId, enteredPin);
@@ -218,27 +212,27 @@ function showVerificationForm(userId) {
 }
 
 /**
- * Muestra el formulario para completar perfil
+ * Show the profile completion form after Google login
  */
 function showProfileCompletionForm(userId, tempToken) {
-    // Ocultar elementos
+    // Hide elements
     document.getElementById('loginForm').style.display = 'none';
     document.getElementById('google-login-btn').style.display = 'none';
     document.getElementById('verificationForm').style.display = 'none';
     
-    // Mostrar formulario
+    // Show profile completion form
     document.getElementById('profileCompletionForm').style.display = 'block';
     
-    // Guardar datos temporales
+    // Save temporary data
     sessionStorage.setItem('tempUserId', userId);
     sessionStorage.setItem('tempToken', tempToken);
     
-    // Configurar botón
+    // Configurate button
     document.getElementById('completeProfileBtn').onclick = completeProfile;
 }
 
 /**
- * Muestra mensajes de error en el login/verificación
+ * show error messages in the login form
  */
 function showError(message) {
     const errorElement = document.getElementById('error-message');
@@ -248,7 +242,7 @@ function showError(message) {
 }
 
 /**
- * Muestra mensajes de error en el formulario de perfil
+ * show error messages in the profile completion form
  */
 function showProfileError(message) {
     const errorElement = document.getElementById('profileError');
@@ -258,7 +252,7 @@ function showProfileError(message) {
 }
 
 /**
- * Carga los países en el select
+ * Load countries for the profile completion form
  */
 async function loadCountries() {
     try {
@@ -279,22 +273,18 @@ async function loadCountries() {
     }
 }
 
-// =============================================
-// INICIALIZACIÓN
-// =============================================
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Cargar países al iniciar
+    
     loadCountries();
     
-    // Configurar manejadores
     window.handleLogin = () => {
         const email = document.getElementById('emailInput').value;
         const password = document.getElementById('passwordInput').value;
         loginUser(email, password);
     };
     
-    // Limpiar datos temporales si se recarga
+    // Clean sessionstorage
     if (sessionStorage.getItem('tempToken') && window.location.pathname.includes('index.html')) {
         sessionStorage.removeItem('tempToken');
         sessionStorage.removeItem('tempUserId');
