@@ -1,16 +1,16 @@
-// Verificar si el usuario está logueado al cargar la página
+// verify if the user is logged in when the page loads
 window.addEventListener("DOMContentLoaded", () => {
-    const user = sessionStorage.getItem('user');
+    const user = sessionStorage.getItem('token');
     if (!user) {
         window.location.href = '/index.html';
     }
 
-    // Asignar eventos solo si el usuario está logueado
+    // Assign events only if the user is logged in
     document.getElementById("createButton").addEventListener("click", createVideo);
     document.getElementById("searchBtn").addEventListener("click", searchVideos);
 });
 
-// Función para crear un nuevo video
+// Function to create a new video
 async function createVideo() {
     const videoName = document.getElementById("name").value.trim();
     const videoURL = document.getElementById("url").value.trim();
@@ -73,7 +73,7 @@ async function createVideo() {
     }
 }
 
-// Función de búsqueda de videos
+// Function to search for videos
 async function searchVideos() {
     const query = document.getElementById("searchQuery").value.trim();
 
@@ -134,7 +134,7 @@ async function searchVideos() {
     }
 }
 
-// Llenar el formulario con los datos del video seleccionado
+// Function to fill the form with the selected video data
 function useVideo(videoStr) {
     const video = JSON.parse(decodeURIComponent(videoStr));
 
