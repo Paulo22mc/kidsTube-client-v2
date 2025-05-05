@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function loadAvatars() {
         if (!avatarSelectionContainer) {
-            console.error("No se encontró el contenedor de avatares.");
+            console.error("The avatar container was not found.");
             return;
         }
 
@@ -33,27 +33,27 @@ document.addEventListener("DOMContentLoaded", function () {
         const selectedAvatar = document.querySelector(".avatar-img.selected");
 
         if (!fullName || !pin || !selectedAvatar) {
-            alert("Por favor, completa todos los campos.");
+            alert("Please complete all fields.");
             return;
         }
 
         const parentData = sessionStorage.getItem("user");
         if (!parentData) {
-            alert("No se encontró el usuario en sessionStorage.");
+            alert("User not found in sessionStorage.");
             return;
         }
 
         const parent = JSON.parse(parentData);
         console.log("Parent Data:", parent);
 
-        // Validar PIN (exactamente 6 dígitos)
+        
         const pinRegex = /^\d{6}$/;
         if (!pinRegex.test(pin)) {
-            alert("El PIN debe tener exactamente 6 dígitos.");
+            alert("The PIN must have exactly 6 digits.");
             return;
         }
 
-        // Crear objeto con los datos del usuario
+        
         const userData = {
             fullName: fullName,
             pin: pin,
@@ -63,7 +63,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         console.log("User Data:", userData);
 
-        // Obtener el token JWT del sessionStorage
+        // Get token JWT of sessionStorage
         const token = sessionStorage.getItem("token");
         if (!token) {
             alert("Authentication token not found. Please log in again.");
@@ -93,7 +93,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
         } catch (error) {
-            console.error("Error en el registro:", error);
+            console.error("Registration error:", error);
         }
     }
 
@@ -101,9 +101,9 @@ document.addEventListener("DOMContentLoaded", function () {
     loadAvatars();
 });
 
-// Verificar si el usuario esta logueado
+// Verify if the user is logged in
 window.addEventListener("DOMContentLoaded", () => {
-    const user = sessionStorage.getItem('user');
+    const user = sessionStorage.getItem('token');
     if (!user) {
         window.location.href = '/index.html';
     }
