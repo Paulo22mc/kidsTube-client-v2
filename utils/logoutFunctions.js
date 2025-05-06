@@ -3,6 +3,7 @@ document.getElementById("logout").addEventListener("click", function (event) {
     event.preventDefault();
     // Eliminar solo el token del sessionStorage
     sessionStorage.removeItem("token");
+    sessionStorage.removeItem("user");
     // Redirigir al usuario a la página de inicio
     window.location.href = "../../index.html";
 });
